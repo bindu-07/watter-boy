@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "144270879312",
+    "project_id": "watterboy-c74c2",
+    "storage_bucket": "watterboy-c74c2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:144270879312:android:d7301b30c40a0015083f55",
+        "android_client_info": {
+          "package_name": "com.example.water_boy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "144270879312-45mg525aln99p68ss9860m6pc54rqlih.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.water_boy",
+            "certificate_hash": "544998cdf4d936ede12a7313a873b65ff512103b"
+          }
+        },
+        {
+          "client_id": "144270879312-b0ikuj93lifsgh11beemb1kjt02sdup5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrovIF-epzo0FBnHxE9FLzoZhucTwBaLI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "144270879312-b0ikuj93lifsgh11beemb1kjt02sdup5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "144270879312-fkd8idcqt1q6emcquabdhtsh5a1dk57c.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.waterBoy"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

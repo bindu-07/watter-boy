@@ -1,0 +1,2 @@
+/Users/apple/StudioProjects/water_boy/android/app/.cxx/Debug/2r701951/x86/CMakeFiles/rebuild_cache.dir
+/Users/apple/StudioProjects/water_boy/android/app/.cxx/Debug/2r701951/x86/CMakeFiles/edit_cache.dir
