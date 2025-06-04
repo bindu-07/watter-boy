@@ -116,7 +116,7 @@ class AuthenticationRepository extends GetxController {
    }
 
    // Send Mobile Number OTP
-   Future<void> sendOtpToPhoneNumber(String phoneNumber) async {
+   Future<void> sendOtpToPhoneNumber(String phoneNumber, String countryCode) async {
      try {
        TFullScreenLoader.openLoadingDialog('we are processing your application', WatterImages.docerAnimation);
        await _auth.verifyPhoneNumber(
@@ -135,6 +135,7 @@ class AuthenticationRepository extends GetxController {
            TFullScreenLoader.stopLoading();
            Get.to(() => EnterOtpScreen(
              phoneNumber: phoneNumber,
+             countryCode: countryCode,
              verificationId: verificationId,
            ));
            TLoaders.successSnackBar(title: 'OTP Sent', message: 'Check your phone for the OTP.');

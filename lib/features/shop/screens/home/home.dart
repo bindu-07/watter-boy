@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:iconsax/iconsax.dart';
@@ -9,6 +12,8 @@ import 'package:water_boy/common/widgets/curved_widget.dart';
 import 'package:water_boy/common/widgets/rounded_container.dart';
 import 'package:water_boy/common/widgets/rounded_image.dart';
 import 'package:water_boy/features/profie/screens/settings/settings.dart';
+import 'package:water_boy/features/shop/controllers/product_controller.dart';
+import 'package:water_boy/features/shop/models/product_model.dart';
 import 'package:water_boy/utils/constants/colors.dart';
 import 'package:water_boy/utils/constants/image_string.dart';
 import 'package:water_boy/utils/constants/sizes.dart';
@@ -17,6 +22,8 @@ import 'package:water_boy/utils/device/device_utility.dart';
 import '../../../../common/widgets/cart_counter_icon.dart';
 import '../../../../common/widgets/circular_container.dart';
 import '../../../../common/widgets/curve_edge_widget.dart';
+import '../../../../common/widgets/location_picker_screen.dart';
+import '../../../../data/repository/user/user_repository.dart';
 import '../../../../utils/helper/helper_function.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -24,6 +31,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(ProductController());
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -31,7 +39,7 @@ class HomeScreen extends StatelessWidget {
             const PrimaryHeaderContainer(
               child: Column(
                 children: [
-                  HomeAppbar(),
+                  LocationAppBar(),
                   SizedBox(
                     height: WatterSizes.spaceBtwSections,
                   ),
@@ -46,16 +54,25 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.all(WatterSizes.defaultSpace),
               child: Column(
                 children: [
-                  GridView.builder(itemCount: 6,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisExtent: 288,
-                        crossAxisSpacing: WatterSizes.gridViewSpacing,
-                        mainAxisSpacing: WatterSizes.gridViewSpacing),
-                    itemBuilder: (_, index) => ProductCardVertical(),
+                  Obx(
+                    (){
+                      if(controller.featuredProduct.isEmpty) {
+                        return Center(child: Text('No data found', style: Theme.of(context).textTheme.bodyMedium));
+                      }
+                      return GridView.builder(
+                        itemCount: controller.featuredProduct.length,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisExtent: 288,
+                            crossAxisSpacing: WatterSizes.gridViewSpacing,
+                            mainAxisSpacing: WatterSizes.gridViewSpacing),
+                        itemBuilder: (_, index) => ProductCardVertical(product: controller.featuredProduct[index]),
+                      );
+                    },
                   )
                 ],
               ),
@@ -69,8 +86,9 @@ class HomeScreen extends StatelessWidget {
 
 class ProductCardVertical extends StatelessWidget {
   const ProductCardVertical({
-    super.key,
+    super.key, required this.product,
   });
+  final ProductModel product;
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +111,9 @@ class ProductCardVertical extends StatelessWidget {
               backgroundColor: dark ? WatterColors.dark : WatterColors.light,
               child: Stack(
                 children: [
-                  const TRoundedImage(
-                    imgUrl: WatterImages.productImage,
+                   TRoundedImage(
+                     isNetworkImage: true,
+                    imgUrl: product.image,
                     applyImageRadius: true,
                   ),
 
@@ -150,7 +169,7 @@ class ProductCardVertical extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        'Green Nike Air',
+                        product.name,
                         style: Theme.of(context).textTheme.titleSmall,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
@@ -166,7 +185,7 @@ class ProductCardVertical extends StatelessWidget {
                     children: [
                       /// price
                       Text(
-                        '\$10',
+                        product.price+' ₹',
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: Theme.of(context).textTheme.headlineMedium,
@@ -244,6 +263,7 @@ class HomeAppbar extends StatelessWidget {
     super.key,
   });
 
+
   @override
   Widget build(BuildContext context) {
     return TAppBar(
@@ -281,11 +301,119 @@ class HomeAppbar extends StatelessWidget {
       ),
       actions: [
         IconButton(
-            onPressed: () =>Get.to(()=> const SettingsScreen()),
+            onPressed: () => Get.to(() => const SettingsScreen()),
             icon: const Icon(
               CupertinoIcons.profile_circled,
               size: 36,
+              color: Colors.white,
             ))
+      ],
+    );
+  }
+}
+
+class LocationAppBar extends StatefulWidget {
+  const LocationAppBar({super.key});
+
+  @override
+  State<LocationAppBar> createState() => _LocationAppBarState();
+}
+
+class _LocationAppBarState extends State<LocationAppBar> {
+  String _location = "Fetching location...";
+  String _shortLocation = "Location";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLocation();
+  }
+
+  Future<void> _fetchLocation() async {
+    try {
+      // Request permission
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        permission = await Geolocator.requestPermission();
+        if (permission != LocationPermission.always &&
+            permission != LocationPermission.whileInUse) return;
+      }
+
+      // Get current position
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      // Get placemarks (address)
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude, position.longitude);
+
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        final fullAddress =
+            "${place.subAdministrativeArea}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+
+        final locationData = {
+          'location': {
+            'fullAddress': fullAddress,
+            'latitude': position.latitude,
+            'longitude': position.longitude,
+            'timestamp': FieldValue.serverTimestamp(),
+          }
+        };
+        final userRepo = Get.put(UserRepository());
+        await userRepo.updateSingleFiled(locationData);
+        setState(() {
+          _location = fullAddress;
+          _shortLocation = place.subLocality ?? "Location";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _location = "Unable to get location";
+        _shortLocation = "Unknown";
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TAppBar(
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.location_pin, color: Colors.red, size: 24),
+              TextButton(
+                onPressed: ()=> _fetchLocation(),
+                child: Text(
+                  _shortLocation,
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall!
+                      .apply(color: WatterColors.white),
+                ),
+              ),
+              const Icon(Icons.arrow_drop_down, color: Colors.white, size: 24),
+            ],
+          ),
+          Text(
+            _location,
+            style: Theme.of(context)
+                .textTheme
+                .labelMedium!
+                .apply(color: WatterColors.white),
+          ),
+        ],
+      ),
+      actions: [
+        IconButton(
+          onPressed: () => Get.to(() => const SettingsScreen()),
+          icon: const Icon(CupertinoIcons.profile_circled,
+              size: 36, color: Colors.white),
+        )
       ],
     );
   }

@@ -10,6 +10,7 @@ import 'package:water_boy/utils/popups/loaders.dart';
 
 import '../../../../data/repository/authentication/authentication_repository.dart';
 import '../../../../data/repository/user/user_repository.dart';
+import '../../../../utils/device/device_utility.dart';
 import '../../models/users/user_mode.dart';
 
 class OtpController extends GetxController {
@@ -20,7 +21,7 @@ class OtpController extends GetxController {
 
   GlobalKey<FormState> verifyKey = GlobalKey<FormState>();
 
-  void verifyOtpWithPhoneNumber(String? verificationId, String? phoneNumber) async {
+  void verifyOtpWithPhoneNumber(String? verificationId, String? phoneNumber, String? countryCode) async {
     try{
       // start loading
       TFullScreenLoader.openLoadingDialog('we are processing your application', WatterImages.docerAnimation);
@@ -45,13 +46,20 @@ class OtpController extends GetxController {
      //Register User in the Firebase Authentication & save user data in firebase
       final userCredential = await AuthenticationRepository.instance.verifyOtpAndLogin(verificationId: verificationId ?? '', smsCode: otpCode);
 
+      String deviceType = "";
+      if(WatterDeviceUtils.isAndroid()) {
+        deviceType = "Android" ;
+      } else {
+        deviceType = "IOS";
+      }
       /// save user data in Firebase FireStore
       final user = UserModel(
           id: userCredential.user!.uid,
           name: "",
           email: "",
           phoneNumber: phoneNumber?? '',
-          profilePicture: ""
+          profilePicture: "",
+          userType: 0, countryCode: countryCode??'', deviceToken: "", deviceType: deviceType, latitude: "", longitude: ""
       );
 
       final userRepo = Get.put(UserRepository());

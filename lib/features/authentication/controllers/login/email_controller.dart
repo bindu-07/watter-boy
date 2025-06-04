@@ -8,6 +8,7 @@ import 'package:water_boy/data/repository/user/user_repository.dart';
 import 'package:water_boy/features/authentication/models/users/user_mode.dart';
 import 'package:water_boy/features/authentication/screens/login/verify_email.dart';
 import 'package:water_boy/utils/constants/image_string.dart';
+import 'package:water_boy/utils/device/device_utility.dart';
 import 'package:water_boy/utils/helper/network_manager.dart';
 import 'package:water_boy/utils/popups/full_screen_loader.dart';
 import 'package:water_boy/utils/popups/loaders.dart';
@@ -41,13 +42,19 @@ class EmailController extends GetxController {
       //Register User in the Firebase Authentication & save user data in firebase
       final userCredential = await AuthenticationRepository.instance.registerOrLoginWithEmail(email.text.trArgs(), "123456");
 
+      String deviceType = "";
+      if(WatterDeviceUtils.isAndroid()) {
+        deviceType = "Android" ;
+      } else {
+        deviceType = "IOS";
+      }
       /// save user data in Firebase FireStore
-       final user = UserModel(
+        final user = UserModel(
            id: userCredential.user!.uid,
            name: "",
            email: email.text.trim(),
            phoneNumber: "",
-           profilePicture: ""
+           profilePicture: "", userType: 0, countryCode: "", deviceToken: "", deviceType: deviceType, latitude: "", longitude: ""
        );
 
        final userRepo = Get.put(UserRepository());

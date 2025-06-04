@@ -10,6 +10,7 @@ import 'package:water_boy/utils/popups/loaders.dart';
 
 import '../../../../data/repository/authentication/authentication_repository.dart';
 import '../../../../data/repository/user/user_repository.dart';
+import '../../../../utils/device/device_utility.dart';
 import '../../models/users/user_mode.dart';
 
 class LoginController extends GetxController {
@@ -17,6 +18,7 @@ class LoginController extends GetxController {
   static LoginController get instance => Get.find();
 
   final phoneNumber = TextEditingController();
+  final countryCode = TextEditingController();
 
   GlobalKey<FormState> numberKey = GlobalKey<FormState>();
 
@@ -41,7 +43,7 @@ class LoginController extends GetxController {
         return;
       }
       final fullNumber = phoneNumber.text.trim();
-      await AuthenticationRepository.instance.sendOtpToPhoneNumber(fullNumber);
+      await AuthenticationRepository.instance.sendOtpToPhoneNumber(fullNumber,countryCode.text.trim());
 
       /*TLoaders.successSnackBar(title: 'OTP Sent', message: 'Check your phone for the OTP.');*/
     } catch (e) {
@@ -69,13 +71,20 @@ class LoginController extends GetxController {
       //Register User in the Firebase Authentication & save user data in firebase
       final userCredential = await AuthenticationRepository.instance.singInWithGoogle();
 
+      String deviceType = "";
+      if(WatterDeviceUtils.isAndroid()) {
+        deviceType = "Android" ;
+      } else {
+        deviceType = "IOS";
+      }
       /// save user data in Firebase FireStore
       final user = UserModel(
           id: userCredential.user!.uid,
           name: userCredential.user!.displayName?? '',
           email: userCredential.user!.email?? '',
           phoneNumber: userCredential.user!.phoneNumber?? '',
-          profilePicture: userCredential.user!.photoURL?? ''
+          profilePicture: userCredential.user!.photoURL?? '',
+          userType: 0, countryCode: "", deviceToken: "", deviceType: deviceType, latitude: "", longitude: ""
       );
 
       final userRepo = Get.put(UserRepository());

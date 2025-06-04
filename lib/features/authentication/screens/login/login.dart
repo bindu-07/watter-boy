@@ -78,6 +78,7 @@ class LoginScreen extends StatelessWidget {
                             return WatterValidator.validatePhoneNumber(value?.completeNumber?? '');},
                           onChanged: (phone) {
                             controller.phoneNumber.text = phone.completeNumber;  // Stores full number like "+91xxxxxxxxxx"
+                            controller.countryCode.text = phone.countryCode.toString();
                           },
                           decoration: InputDecoration(
                               labelText: WatterText.enterNumber,

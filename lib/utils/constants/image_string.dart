@@ -28,7 +28,7 @@ class WatterImages {
   static const String orderOutForDeliveryAnimation = "assets/images/animations/out-for-delivery.json";
   static const String orderDeliveredAnimation = "assets/images/animations/deliverd.json";
 
-  static const String productImage = "assets/icons/nike-shoes.png";
+  static const String productImage = "assets/icons/watter_continer.jpg";
   static const String userImage = "assets/icons/user.png";
 
   // -- Payment Methods

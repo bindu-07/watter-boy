@@ -9,7 +9,7 @@ import '../../../../utils/constants/image_string.dart';
 class OrderDetailsPage extends StatelessWidget {
   const OrderDetailsPage({super.key});
 
-  final int currentStep = 3; // 0: Placed, 1: In Progress, 2: Out for Delivery, 3: Delivered
+  final int currentStep = 2; // 0: Placed, 1: In Progress, 2: Out for Delivery, 3: Delivered
 
   @override
   Widget build(BuildContext context) {

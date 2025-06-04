@@ -13,9 +13,10 @@ import '../../../../utils/helper/helper_function.dart';
 
 
 class EnterOtpScreen extends StatelessWidget {
-  const EnterOtpScreen({super.key, this.phoneNumber, this.verificationId});
+  const EnterOtpScreen({super.key, this.phoneNumber, this.verificationId, this.countryCode});
   final String? phoneNumber;
   final String? verificationId;
+  final String? countryCode;
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +140,7 @@ class EnterOtpScreen extends StatelessWidget {
 
                       //// SigIn Button
 
-                      SizedBox(width: double.infinity, child: ElevatedButton(onPressed: ()=> controller.verifyOtpWithPhoneNumber(verificationId, phoneNumber), child: const Text(WatterText.signIn))),
+                      SizedBox(width: double.infinity, child: ElevatedButton(onPressed: ()=> controller.verifyOtpWithPhoneNumber(verificationId, phoneNumber, countryCode), child: const Text(WatterText.signIn))),
 
                     ],
                   ),

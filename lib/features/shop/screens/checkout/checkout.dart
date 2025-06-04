@@ -7,6 +7,7 @@ import 'package:water_boy/common/widgets/appbar.dart';
 import 'package:water_boy/common/widgets/rounded_container.dart';
 import 'package:water_boy/common/widgets/success_screen.dart';
 import 'package:water_boy/features/shop/screens/cart/cart_item.dart';
+import 'package:water_boy/features/shop/screens/checkout/select_delivery_boy.dart';
 import 'package:water_boy/navigation_menu.dart';
 import 'package:water_boy/utils/constants/colors.dart';
 import 'package:water_boy/utils/constants/image_string.dart';
@@ -31,10 +32,20 @@ class CheckoutScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(WatterSizes.defaultSpace),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CartItems(
+              /*const CartItems(
                 showAddRemoveButton: false,
               ),
+              const SizedBox(
+                height: WatterSizes.spaceBtwSections,
+              ),*/
+              Text("Select a Delivery Boy",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(
+                height: WatterSizes.spaceBtwSections,
+              ),
+              DeliveryBoySelector(),
               const SizedBox(
                 height: WatterSizes.spaceBtwSections,
               ),
