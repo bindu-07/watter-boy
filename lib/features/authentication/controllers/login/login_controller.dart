@@ -84,7 +84,7 @@ class LoginController extends GetxController {
           email: userCredential.user!.email?? '',
           phoneNumber: userCredential.user!.phoneNumber?? '',
           profilePicture: userCredential.user!.photoURL?? '',
-          userType: 0, countryCode: "", deviceToken: "", deviceType: deviceType, latitude: "", longitude: ""
+          userType: 0, countryCode: "", deviceToken: "", deviceType: deviceType
       );
 
       final userRepo = Get.put(UserRepository());

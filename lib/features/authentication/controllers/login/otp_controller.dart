@@ -59,7 +59,7 @@ class OtpController extends GetxController {
           email: "",
           phoneNumber: phoneNumber?? '',
           profilePicture: "",
-          userType: 0, countryCode: countryCode??'', deviceToken: "", deviceType: deviceType, latitude: "", longitude: ""
+          userType: 0, countryCode: countryCode??'', deviceToken: "", deviceType: deviceType
       );
 
       final userRepo = Get.put(UserRepository());

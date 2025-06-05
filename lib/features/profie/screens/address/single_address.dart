@@ -6,11 +6,13 @@ import 'package:water_boy/utils/constants/sizes.dart';
 import 'package:water_boy/utils/helper/helper_function.dart';
 
 import '../../../../common/widgets/rounded_container.dart';
+import '../../models/address_model.dart';
 
 class SingleAddress extends StatelessWidget {
-  const SingleAddress({super.key, required this.selectedAddress});
+  const SingleAddress({super.key, required this.selectedAddress, required this.address});
 
   final bool selectedAddress;
+  final AddressModel address;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +48,7 @@ class SingleAddress extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Bindu hait',
+                address.receiverName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleLarge,
@@ -55,7 +57,7 @@ class SingleAddress extends StatelessWidget {
                 height: WatterSizes.sm,
               ),
               Text(
-                'Phone Number: +91 9330373008',
+                'Phone Number: ${address.receiverNumber}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleLarge,
@@ -63,8 +65,8 @@ class SingleAddress extends StatelessWidget {
               const SizedBox(
                 height: WatterSizes.sm ,
               ),
-              const Text(
-                'Singur, Hooghly, hait para, 712223, mollasimla',
+              Text(
+                '${address.house}, ${address.floor}, ${address.landmark}',
                 softWrap: true,
               ),
             ],

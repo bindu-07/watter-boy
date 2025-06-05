@@ -54,7 +54,7 @@ class EmailController extends GetxController {
            name: "",
            email: email.text.trim(),
            phoneNumber: "",
-           profilePicture: "", userType: 0, countryCode: "", deviceToken: "", deviceType: deviceType, latitude: "", longitude: ""
+           profilePicture: "", userType: 0, countryCode: "", deviceToken: "", deviceType: deviceType
        );
 
        final userRepo = Get.put(UserRepository());

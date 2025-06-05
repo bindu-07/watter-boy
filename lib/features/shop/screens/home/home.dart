@@ -25,6 +25,7 @@ import '../../../../common/widgets/curve_edge_widget.dart';
 import '../../../../common/widgets/location_picker_screen.dart';
 import '../../../../data/repository/user/user_repository.dart';
 import '../../../../utils/helper/helper_function.dart';
+import '../../../authentication/models/users/user_mode.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -168,12 +169,14 @@ class ProductCardVertical extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        product.name,
-                        style: Theme.of(context).textTheme.titleSmall,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                        textAlign: TextAlign.left,
+                      Expanded(
+                        child: Text(
+                          product.name,
+                          style: Theme.of(context).textTheme.titleSmall,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          textAlign: TextAlign.left,
+                        ),
                       ),
                     ],
                   ),
@@ -353,16 +356,17 @@ class _LocationAppBarState extends State<LocationAppBar> {
         final fullAddress =
             "${place.subAdministrativeArea}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
 
-        final locationData = {
-          'location': {
-            'fullAddress': fullAddress,
-            'latitude': position.latitude,
-            'longitude': position.longitude,
-            'timestamp': FieldValue.serverTimestamp(),
-          }
-        };
+        final location = UserLocation(
+          fullAddress: fullAddress,
+          latitude: position.latitude,
+          longitude: position.longitude,
+          timestamp: DateTime.now(), // not used in Firestore, just for local reference
+        );
+
         final userRepo = Get.put(UserRepository());
-        await userRepo.updateSingleFiled(locationData);
+        await userRepo.updateSingleFiled({
+          'location': location.toMap(),
+        });
         setState(() {
           _location = fullAddress;
           _shortLocation = place.subLocality ?? "Location";

@@ -10,9 +10,23 @@ import 'package:water_boy/features/profie/screens/address/single_address.dart';
 import 'package:water_boy/utils/constants/colors.dart';
 
 import '../../../../utils/constants/sizes.dart';
+import '../../controllers/address/address_select_controller.dart';
 
-class AddressScreen extends StatelessWidget {
+class AddressScreen extends StatefulWidget {
   const AddressScreen({super.key});
+
+  @override
+  State<AddressScreen> createState() => _AddressScreenState();
+}
+
+class _AddressScreenState extends State<AddressScreen> {
+  late final SelectAddressController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(SelectAddressController()); // ✅ SAFE HERE
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,17 +46,17 @@ class AddressScreen extends StatelessWidget {
           style: Theme.of(context).textTheme.headlineSmall,
         ),
       ),
-      body: const SingleChildScrollView(
-        child: Padding(
-          padding:  EdgeInsets.all(WatterSizes.defaultSpace),
-          child: Column(
-            children: [
-              SingleAddress(selectedAddress: false),
-              SingleAddress(selectedAddress: true),
-              SingleAddress(selectedAddress: false),
-            ],
-          ),
-        ),
+      body: Obx(() =>ListView.builder(
+          padding: const EdgeInsets.all(WatterSizes.defaultSpace),
+          itemCount: controller.addresses.length,
+          itemBuilder: (_, index) {
+            final address = controller.addresses[index];
+            return SingleAddress(
+              selectedAddress: address.isSelected,
+              address: address,
+            );
+          },
+        )
       ),
     );
   }
