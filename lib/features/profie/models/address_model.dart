@@ -6,7 +6,7 @@ class AddressModel {
   final String house;
   final String floor;
   final String landmark;
-  final bool isSelected;
+  bool isSelected;
   final DateTime createdAt;
 
   AddressModel({
@@ -15,7 +15,7 @@ class AddressModel {
     required this.house,
     required this.floor,
     required this.landmark,
-    required this.isSelected,
+     this.isSelected = false,
     required this.createdAt,
   });
 

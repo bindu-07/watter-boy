@@ -9,69 +9,68 @@ import '../../../../common/widgets/rounded_container.dart';
 import '../../models/address_model.dart';
 
 class SingleAddress extends StatelessWidget {
-  const SingleAddress({super.key, required this.selectedAddress, required this.address});
+  const SingleAddress({super.key, required this.selectedAddress, required this.address, required this.onDelete, required this.onSelect});
 
   final bool selectedAddress;
   final AddressModel address;
+  final VoidCallback onDelete;
+  final VoidCallback onSelect;
 
   @override
   Widget build(BuildContext context) {
     final dark = WatterHelperFunction.isDarkMode(context);
-    return TRoundedContainer(
-      width: double.infinity,
-      showBorder: true,
-      padding: const EdgeInsets.all(WatterSizes.md),
-      backgroundColor: selectedAddress
-          ? WatterColors.primary.withOpacity(0.5)
-          : Colors.transparent,
-      borderColor: selectedAddress
-          ? Colors.transparent
-          : dark
-              ? WatterColors.darkerGrey
-              : WatterColors.grey,
-      margin: const EdgeInsets.only(top: WatterSizes.spaceBtwItems),
-      child: Stack(
-        children: [
-          Positioned(
-            right: 5,
-            top: 0,
-            child: Icon(
-              selectedAddress ? Iconsax.tick_circle5 : null,
+
+    return GestureDetector(
+      onTap: onSelect,
+      child: TRoundedContainer(
+        width: double.infinity,
+        padding: const EdgeInsets.all(WatterSizes.md),
+        margin: const EdgeInsets.only(bottom: WatterSizes.spaceBtwItems),
+        showBorder: true,
+        borderColor: selectedAddress
+            ? Colors.transparent
+            : (dark ? WatterColors.darkerGrey : WatterColors.grey),
+        backgroundColor: selectedAddress
+            ? WatterColors.primary.withOpacity(0.1)
+            : Colors.transparent,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              selectedAddress ? Iconsax.tick_circle : Iconsax.location,
               color: selectedAddress
-                  ? dark
-                      ? WatterColors.light
-                      : WatterColors.dark
-                  : null,
+                  ? WatterColors.primary
+                  : dark
+                  ? Colors.white
+                  : Colors.black,
+              size: 28,
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                address.receiverName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleLarge,
+            const SizedBox(width: WatterSizes.spaceBtwItems),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(address.receiverName,
+                      style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 4),
+                  Text('📞 ${address.receiverNumber}',
+                      style: Theme.of(context).textTheme.bodyMedium),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${address.house}, ${address.floor}, ${address.landmark}',
+                    style: Theme.of(context).textTheme.bodySmall,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: WatterSizes.sm,
-              ),
-              Text(
-                'Phone Number: ${address.receiverNumber}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(
-                height: WatterSizes.sm ,
-              ),
-              Text(
-                '${address.house}, ${address.floor}, ${address.landmark}',
-                softWrap: true,
-              ),
-            ],
-          )
-        ],
+            ),
+            IconButton(
+              icon: const Icon(Iconsax.trash, color: Colors.red),
+              onPressed: onDelete,
+            ),
+          ],
+        ),
       ),
     );
   }

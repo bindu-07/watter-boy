@@ -7,6 +7,8 @@ import 'package:water_boy/features/profie/models/address_model.dart';
 
 import '../../../../utils/popups/full_screen_loader.dart';
 import '../../../../utils/popups/loaders.dart';
+import '../../screens/address/address.dart';
+import 'address_select_controller.dart';
 
 class AddressController extends GetxController {
   static AddressController get instance=>Get.find();
@@ -42,8 +44,7 @@ class AddressController extends GetxController {
       );
 
       await AddressRepository.instance.addNewAddress(address);
-
-      Get.back(); // Return to previous screen
+      Get.back(result: true);// Return to All Address Screen
       TLoaders.successSnackBar(title: 'Success', message: 'Address added successfully');
       clearForm();
     } catch (e) {

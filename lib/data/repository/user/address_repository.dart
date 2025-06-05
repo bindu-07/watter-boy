@@ -52,15 +52,15 @@ class AddressRepository extends GetxController {
 
   Future<List<AddressModel>> fetchUserAddresses() async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('addresses')
-        .orderBy('createdAt', descending: true)
-        .get();
+    final doc = await _db.collection('users').doc(uid).get();
+    final data = doc.data();
 
-    return querySnapshot.docs.map((doc) {
-      return AddressModel.fromMap(doc.data());
-    }).toList();
+    final List<dynamic> list = data?['addresses'] ?? [];
+
+    final addressModels = list
+        .map((e) => AddressModel.fromMap(Map<String, dynamic>.from(e)))
+        .toList();
+    print('object==================> ${addressModels}');
+    return addressModels;
   }
 }

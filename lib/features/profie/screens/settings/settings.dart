@@ -27,127 +27,127 @@ class SettingsScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-        PrimaryHeaderContainer(
-        child: Column(
-        children: [
-          TAppBar(
-          showBackArrow: true,
-          title: Text(
-            'Settings',
-            style: Theme
-                .of(context)
-                .textTheme
-                .headlineMedium!
-                .apply(color: WatterColors.white),
-          ),
-        ),
+            PrimaryHeaderContainer(
+              child: Column(
+                children: [
+                  TAppBar(
+                    showBackArrow: true,
+                    title: Text(
+                      'Settings',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium!
+                          .apply(color: WatterColors.white),
+                    ),
+                  ),
 
-        // User Profile Card
-        UserProfileTile(
-          onPressed: () => Get.to(() => const ProfileScreen()),
+                  // User Profile Card
+                  UserProfileTile(
+                    onPressed: () => Get.to(() => const ProfileScreen()),
+                  ),
+                  const SizedBox(
+                    height: WatterSizes.spaceBtwSections,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(WatterSizes.defaultSpace),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Account Settings',
+                        style: Theme.of(context).textTheme.headlineSmall?.apply(
+                            color: WatterHelperFunction.isDarkMode(context)
+                                ? Colors.white
+                                : WatterColors.black),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: WatterSizes.spaceBtwSections,
+                  ),
+                  SettingsMenuTile(
+                    icon: Iconsax.safe_home,
+                    title: 'My Address',
+                    subtitle: 'Set Delivery address',
+                    onTab: () {
+                      // Get.put(SelectAddressController()); // before navigation
+                      Get.to(() => const AddressScreen());
+                    }, // now it's safe},
+                  ),
+                  SettingsMenuTile(
+                    icon: Iconsax.shopping_cart,
+                    title: 'My Orders',
+                    subtitle: 'In-progress and complete orders',
+                    onTab: () => Get.to(() => OrdersScreen()),
+                  ),
+                  /*SettingsMenuTile(icon: Iconsax.safe_home, title: 'My Address', subtitle: 'Set Delivery address',trailing: Switch(value: false, onChanged: (value) {}),),*/
+                  // Logout Button
+                  const SizedBox(
+                    height: WatterSizes.spaceBtwSections,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                        onPressed: () {}, child: const Text('Logout')),
+                  ),
+                  const SizedBox(
+                    height: WatterSizes.spaceBtwSections * 2.5,
+                  )
+                ],
+              ),
+            ),
+          ],
         ),
-        const SizedBox(
-          height: WatterSizes.spaceBtwSections,
-        ),
-        ],
       ),
-    ),
-    Padding(
-    padding: const EdgeInsets.all(WatterSizes.defaultSpace),
-    child: Column(
-    children: [
-    Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-    Text(
-    'Account Settings',
-    style: Theme.of(context).textTheme.headlineSmall?.apply(
-    color: WatterHelperFunction.isDarkMode(context)
-    ? Colors.white
-        : WatterColors.black),
-    maxLines: 1,
-    overflow: TextOverflow.ellipsis,
-    )
-    ],
-    ),
-    const SizedBox(
-    height: WatterSizes.spaceBtwSections,
-    ),
-    SettingsMenuTile(
-    icon: Iconsax.safe_home,
-    title: 'My Address',
-    subtitle: 'Set Delivery address',
-    onTab: () {
-    Get.put(SelectAddressController()); // before navigation
-    Get.to(() => const AddressScreen()); },// now it's safe},
-    ),
-    SettingsMenuTile(
-    icon: Iconsax.shopping_cart,
-    title: 'My Orders',
-    subtitle: 'In-progress and complete orders',
-    onTab: () => Get.to(() => OrdersScreen()),
-    ),
-    /*SettingsMenuTile(icon: Iconsax.safe_home, title: 'My Address', subtitle: 'Set Delivery address',trailing: Switch(value: false, onChanged: (value) {}),),*/
-    // Logout Button
-    const SizedBox(
-    height: WatterSizes.spaceBtwSections,
-    ),
-    SizedBox(
-    width: double.infinity,
-    child: OutlinedButton(
-    onPressed: () {}, child: const Text('Logout')),
-    ),
-    const SizedBox(
-    height: WatterSizes.spaceBtwSections * 2.5,
-    )
-    ],
-    ),
-    ),
-    ],
-    ),
-    ),
     );
-    }
   }
+}
 
-  class UserProfileTile extends StatelessWidget {
+class UserProfileTile extends StatelessWidget {
   const UserProfileTile({
-  super.key,
-  required this.onPressed,
+    super.key,
+    required this.onPressed,
   });
 
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-  return ListTile(
-  leading: const TRoundedImage(
-  imgUrl: WatterImages.userImage,
-  applyImageRadius: true,
-  width: 50,
-  height: 50,
-  borderRadius: 50,
-  ),
-  title: Text(
-  'Bindu Hait',
-  style: Theme.of(context)
-      .textTheme
-      .headlineSmall
-      ?.apply(color: WatterColors.white),
-  ),
-  subtitle: Text(
-  '+91 9330373008',
-  style: Theme.of(context)
-      .textTheme
-      .bodyMedium
-      ?.apply(color: WatterColors.white),
-  ),
-  trailing: IconButton(
-  onPressed: onPressed,
-  icon: const Icon(
-  Iconsax.edit,
-  color: WatterColors.white,
-  )),
-  );
+    return ListTile(
+      leading: const TRoundedImage(
+        imgUrl: WatterImages.userImage,
+        applyImageRadius: true,
+        width: 50,
+        height: 50,
+        borderRadius: 50,
+      ),
+      title: Text(
+        'Bindu Hait',
+        style: Theme.of(context)
+            .textTheme
+            .headlineSmall
+            ?.apply(color: WatterColors.white),
+      ),
+      subtitle: Text(
+        '+91 9330373008',
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium
+            ?.apply(color: WatterColors.white),
+      ),
+      trailing: IconButton(
+          onPressed: onPressed,
+          icon: const Icon(
+            Iconsax.edit,
+            color: WatterColors.white,
+          )),
+    );
   }
-  }
+}

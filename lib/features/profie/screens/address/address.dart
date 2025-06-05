@@ -33,7 +33,10 @@ class _AddressScreenState extends State<AddressScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: WatterColors.primary,
-        onPressed: () => Get.to(() => const AddNewAddressScreen()),
+        onPressed: () async {
+          await Get.to(() => const AddNewAddressScreen());
+          controller.fetchAddresses(); // 🔁 refresh the list
+        },
         child: const Icon(
           Iconsax.add,
           color: Colors.white,
@@ -54,6 +57,24 @@ class _AddressScreenState extends State<AddressScreen> {
             return SingleAddress(
               selectedAddress: address.isSelected,
               address: address,
+              onDelete: () {
+                Get.defaultDialog(
+                  title: 'Delete Address?',
+                  middleText: 'Are you sure you want to remove this address?',
+                  confirm: ElevatedButton(
+                    onPressed: () {
+                      controller.deleteAddress(index);
+                      Get.back();
+                    },
+                    child: const Text('Delete'),
+                  ),
+                  cancel: OutlinedButton(
+                    onPressed: () => Get.back(),
+                    child: const Text('Cancel'),
+                  ),
+                );
+              },
+              onSelect: () => controller.selectAddress(index),
             );
           },
         )

@@ -36,11 +36,37 @@ class SelectAddressController extends GetxController {
           .map((e) => AddressModel.fromMap(Map<String, dynamic>.from(e)))
           .toList();
       print('object =======> ${addressModels.length}');
-      // TFullScreenLoader.stopLoading();
       addresses.assignAll(addressModels);
+      // TFullScreenLoader.stopLoading();
     } catch (e) {
+      TFullScreenLoader.stopLoading();
       print('ERROR =======> ${e.toString()}');
       TLoaders.errorSnackBar(title: 'Oh Snap!', message: e.toString());
     }
   }
+
+
+  Future<void> deleteAddress(int index) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
+    addresses.removeAt(index);
+    await _db.collection('users').doc(uid).update({
+      'addresses': addresses.map((e) => e.toMap()).toList(),
+    });
+  }
+  Future<void> selectAddress(int index) async {
+    print('selectAddress');
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
+    for (int i = 0; i < addresses.length; i++) {
+      addresses[i].isSelected = i == index;
+    }
+
+    await _db.collection('users').doc(uid).update({
+      'addresses': addresses.map((e) => e.toMap()).toList(),
+    });
+
+    addresses.refresh();
+  }
+
 }
