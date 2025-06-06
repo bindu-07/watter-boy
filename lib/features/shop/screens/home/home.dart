@@ -25,7 +25,10 @@ import '../../../../common/widgets/curve_edge_widget.dart';
 import '../../../../common/widgets/location_picker_screen.dart';
 import '../../../../data/repository/user/user_repository.dart';
 import '../../../../utils/helper/helper_function.dart';
+import '../../../../utils/popups/loaders.dart';
 import '../../../authentication/models/users/user_mode.dart';
+import '../../controllers/cart_controller.dart';
+import '../cart/cart_item.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -56,9 +59,11 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 children: [
                   Obx(
-                    (){
-                      if(controller.featuredProduct.isEmpty) {
-                        return Center(child: Text('No data found', style: Theme.of(context).textTheme.bodyMedium));
+                    () {
+                      if (controller.featuredProduct.isEmpty) {
+                        return Center(
+                            child: Text('No data found',
+                                style: Theme.of(context).textTheme.bodyMedium));
                       }
                       return GridView.builder(
                         itemCount: controller.featuredProduct.length,
@@ -66,12 +71,13 @@ class HomeScreen extends StatelessWidget {
                         physics: const NeverScrollableScrollPhysics(),
                         padding: EdgeInsets.zero,
                         gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisExtent: 288,
-                            crossAxisSpacing: WatterSizes.gridViewSpacing,
-                            mainAxisSpacing: WatterSizes.gridViewSpacing),
-                        itemBuilder: (_, index) => ProductCardVertical(product: controller.featuredProduct[index]),
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisExtent: 288,
+                                crossAxisSpacing: WatterSizes.gridViewSpacing,
+                                mainAxisSpacing: WatterSizes.gridViewSpacing),
+                        itemBuilder: (_, index) => ProductCardVertical(
+                            product: controller.featuredProduct[index]),
                       );
                     },
                   )
@@ -87,141 +93,122 @@ class HomeScreen extends StatelessWidget {
 
 class ProductCardVertical extends StatelessWidget {
   const ProductCardVertical({
-    super.key, required this.product,
+    super.key,
+    required this.product,
   });
+
   final ProductModel product;
 
   @override
   Widget build(BuildContext context) {
-    final dark = WatterHelperFunction.isDarkMode(context);
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        width: 180,
-        padding: const EdgeInsets.all(1),
-        decoration: BoxDecoration(
-            boxShadow: [ShadowStyle.verticalProductShadow],
-            borderRadius: BorderRadius.circular(WatterSizes.productImageRadius),
-            color: dark ? WatterColors.darkGrey : WatterColors.white),
-        child: Column(
-          children: [
-            //// Thumbnail
-            TRoundedContainer(
-              height: 180,
-              padding: const EdgeInsets.all(WatterSizes.sm),
-              backgroundColor: dark ? WatterColors.dark : WatterColors.light,
-              child: Stack(
-                children: [
-                   TRoundedImage(
-                     isNetworkImage: true,
-                    imgUrl: product.image,
-                    applyImageRadius: true,
-                  ),
+    final cartController = Get.put(CartController());
+    final isDark = WatterHelperFunction.isDarkMode(context);
 
-                  /// Sale tag
-                  Positioned(
-                    top: 12,
-                    child: TRoundedContainer(
-                      height: WatterSizes.lg,
-                      backgroundColor: WatterColors.secondary.withOpacity(0.8),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: WatterSizes.sm, vertical: WatterSizes.xs),
-                      child: Text(
-                        '25%',
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelLarge!
-                            .apply(color: WatterColors.black),
-                      ),
-                    ),
-                  ),
-
-                  /// favourite Icon button
-                  /*Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          color: dark
-                              ? WatterColors.black.withOpacity(0.9)
-                              : WatterColors.white.withOpacity(0.9)),
-                      child: IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            Iconsax.heart5,
-                            color: Colors.red,
-                          )),
-                    ),
-                  )*/
-                ],
+    return Container(
+      width: 180,
+      decoration: BoxDecoration(
+        color: isDark ? WatterColors.darkGrey : WatterColors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? Colors.black26 : Colors.grey.shade200,
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Product Image with Discount Badge
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                child: TRoundedImage(
+                  imgUrl: product.image,
+                  height: 160,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  isNetworkImage: true,
+                ),
               ),
-            ),
-
-            const SizedBox(
-              height: WatterSizes.spaceBtwItems / 2,
-            ),
-
-            /// -- Details
-            Padding(
-              padding: const EdgeInsets.only(left: WatterSizes.sm),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          product.name,
-                          style: Theme.of(context).textTheme.titleSmall,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          textAlign: TextAlign.left,
-                        ),
-                      ),
-                    ],
+              Positioned(
+                top: 8,
+                left: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  const SizedBox(
-                    height: WatterSizes.spaceBtwItems / 2,
+                  child: Text(
+                    "25% OFF",
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      /// price
-                      Text(
-                        product.price+' ₹',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: Theme.of(context).textTheme.headlineMedium,
+                ),
+              ),
+            ],
+          ),
+
+          // Product Details
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  product.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Price
+                    Text(
+                      '₹${product.price}',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: WatterColors.primary,
                       ),
-                      Container(
-                        decoration: const BoxDecoration(
-                            color: WatterColors.dark,
-                            borderRadius: BorderRadius.only(
-                                topLeft:
-                                    Radius.circular(WatterSizes.cardRadiusMd),
-                                bottomRight: Radius.circular(
-                                    WatterSizes.productImageRadius))),
-                        child: const SizedBox(
-                            width: WatterSizes.iconLg * 1.2,
-                            height: WatterSizes.iconLg * 1.2,
-                            child: Center(
-                              child: Icon(
-                                Iconsax.add,
-                                color: WatterColors.white,
-                              ),
-                            )),
+                    ),
+
+                    // Cart Actions
+                    Obx(() {
+                      final quantity = cartController.cartItems[product] ?? 0;
+
+                      return quantity > 0
+                          ? ProductQuantity(
+                        quantity: quantity,
+                        onAdd: () => cartController.addToCart(product),
+                        onRemove: () => cartController.removeFromCart(product),
+                        compact: false,
                       )
-                    ],
-                  )
-                ],
-              ),
-            )
-          ],
-        ),
+                          : Container(
+                        decoration: BoxDecoration(
+                          color: WatterColors.primary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Iconsax.add, color: Colors.white),
+                          onPressed: () => cartController.addToCart(product),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
+
 
 class SearchContainer extends StatelessWidget {
   const SearchContainer({
@@ -261,7 +248,7 @@ class SearchContainer extends StatelessWidget {
   }
 }
 
-class HomeAppbar extends StatelessWidget {
+/*class HomeAppbar extends StatelessWidget {
   const HomeAppbar({
     super.key,
   });
@@ -313,7 +300,7 @@ class HomeAppbar extends StatelessWidget {
       ],
     );
   }
-}
+}*/
 
 class LocationAppBar extends StatefulWidget {
   const LocationAppBar({super.key});
@@ -348,8 +335,8 @@ class _LocationAppBarState extends State<LocationAppBar> {
           desiredAccuracy: LocationAccuracy.high);
 
       // Get placemarks (address)
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-          position.latitude, position.longitude);
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
 
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
@@ -360,7 +347,8 @@ class _LocationAppBarState extends State<LocationAppBar> {
           fullAddress: fullAddress,
           latitude: position.latitude,
           longitude: position.longitude,
-          timestamp: DateTime.now(), // not used in Firestore, just for local reference
+          timestamp:
+              DateTime.now(), // not used in Firestore, just for local reference
         );
 
         final userRepo = Get.put(UserRepository());
@@ -391,7 +379,7 @@ class _LocationAppBarState extends State<LocationAppBar> {
             children: [
               const Icon(Icons.location_pin, color: Colors.red, size: 24),
               TextButton(
-                onPressed: ()=> _fetchLocation(),
+                onPressed: () => _fetchLocation(),
                 child: Text(
                   _shortLocation,
                   style: Theme.of(context)
