@@ -12,10 +12,12 @@ import 'package:water_boy/utils/constants/colors.dart';
 import 'package:water_boy/utils/helper/helper_function.dart';
 
 import '../../../../common/widgets/rounded_image.dart';
+import '../../../../data/repository/authentication/authentication_repository.dart';
 import '../../../../utils/constants/image_string.dart';
 import '../../../../utils/constants/sizes.dart';
 import '../../../shop/screens/home/home.dart';
 import '../../controllers/address/address_select_controller.dart';
+import '../../controllers/settings/settings_controller.dart';
 import '../address/add_new_address.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -42,9 +44,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
 
                   // User Profile Card
-                  UserProfileTile(
-                    onPressed: () => Get.to(() => const ProfileScreen()),
-                  ),
+                  UserProfileTile(),
                   const SizedBox(
                     height: WatterSizes.spaceBtwSections,
                   ),
@@ -95,7 +95,7 @@ class SettingsScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
-                        onPressed: () {}, child: const Text('Logout')),
+                        onPressed: () => AuthenticationRepository.instance.logout(), child: const Text('Logout')),
                   ),
                   const SizedBox(
                     height: WatterSizes.spaceBtwSections * 2.5,
@@ -113,41 +113,42 @@ class SettingsScreen extends StatelessWidget {
 class UserProfileTile extends StatelessWidget {
   const UserProfileTile({
     super.key,
-    required this.onPressed,
   });
 
-  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: const TRoundedImage(
-        imgUrl: WatterImages.userImage,
+    final user = UserController.instance.user;
+    return Obx(() =>ListTile(
+      leading:  TRoundedImage(
+        imgUrl: user.value.profilePicture.isNotEmpty
+            ? user.value.profilePicture
+            : WatterImages.userImage,
         applyImageRadius: true,
         width: 50,
         height: 50,
         borderRadius: 50,
       ),
       title: Text(
-        'Bindu Hait',
+        user.value.name,
         style: Theme.of(context)
             .textTheme
             .headlineSmall
             ?.apply(color: WatterColors.white),
       ),
       subtitle: Text(
-        '+91 9330373008',
+          user.value.phoneNumber,
         style: Theme.of(context)
             .textTheme
             .bodyMedium
             ?.apply(color: WatterColors.white),
       ),
       trailing: IconButton(
-          onPressed: onPressed,
+          onPressed: () => Get.to(() => ProfileScreen( userModel: user)),
           icon: const Icon(
             Iconsax.edit,
             color: WatterColors.white,
           )),
-    );
+    ));
   }
 }

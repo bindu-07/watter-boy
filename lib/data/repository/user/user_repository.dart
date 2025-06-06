@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -8,6 +9,7 @@ import 'package:http/http.dart';
 import 'package:water_boy/data/repository/authentication/authentication_repository.dart';
 
 import '../../../features/authentication/models/users/user_mode.dart';
+import '../../../features/authentication/screens/login/login.dart';
 import '../../../utils/exceptions/firebase_exceptions.dart';
 import '../../../utils/exceptions/format_exceptions.dart';
 import '../../../utils/exceptions/platform_exceptions.dart';
@@ -68,6 +70,7 @@ class UserRepository extends GetxController {
   Future<void> deleteUserData(String userId) async{
     try {
       await _db.collection("users").doc(userId).delete();
+      Get.offAll(()=> const LoginScreen());
     } on FirebaseException catch (e) {
       throw TFirebaseException(e.code).message;
     } on FormatException catch (_) {

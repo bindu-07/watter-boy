@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:water_boy/common/widgets/appbar.dart';
 import 'package:water_boy/common/widgets/circular_container.dart';
 import 'package:water_boy/common/widgets/rounded_image.dart';
+import 'package:water_boy/data/repository/user/user_repository.dart';
+import 'package:water_boy/features/authentication/models/users/user_mode.dart';
 import 'package:water_boy/utils/constants/image_string.dart';
 import 'package:water_boy/utils/constants/sizes.dart';
 import 'package:water_boy/utils/device/device_utility.dart';
@@ -12,7 +15,9 @@ import '../../../../utils/constants/colors.dart';
 import '../../../../utils/helper/helper_function.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({super.key, required this.userModel});
+
+  final Rx<UserModel> userModel;
 
   @override
   Widget build(BuildContext context) {
@@ -75,17 +80,17 @@ class ProfileScreen extends StatelessWidget {
               ProfileMenu(
                 onPressed: () {},
                 title: 'Name',
-                value: 'Bindu hait',
+                value: userModel.value.name,
               ),
               ProfileMenu(
                 onPressed: () {},
                 title: 'E-mail',
-                value: 'hite2002@gmail.com',
+                value: userModel.value.email,
               ),
               ProfileMenu(
                 onPressed: () {},
                 title: 'Phone Number',
-                value: '+91 9233456465',
+                value: userModel.value.phoneNumber,
               ),
               const SizedBox(
                 height: WatterSizes.spaceBtwSections,
@@ -96,7 +101,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               Center(
                 child: TextButton(
-                    onPressed: () {},
+                    onPressed: () => UserRepository.instance.deleteUserData(userModel.value.id),
                     child: const Text(
                       'Delete Account',
                       style: TextStyle(color: Colors.red),
