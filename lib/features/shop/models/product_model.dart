@@ -21,7 +21,7 @@ class ProductModel {
   /// convert model to JSON structure for storing data in Firebase
   toJson(){
     return {
-      'id' : name,
+      'id' : id,
       'image' : image,
       'isActive': isActive,
       'name': name,
@@ -40,6 +40,12 @@ class ProductModel {
           image: data['image']?? ''
       );
   }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is ProductModel && other.id == id);
+
+  @override
+  int get hashCode => id.hashCode;
 
 //factory Method to create a User model to a Firebase document snapshot
 
