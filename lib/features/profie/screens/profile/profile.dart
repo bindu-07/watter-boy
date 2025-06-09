@@ -80,7 +80,7 @@ class ProfileScreen extends StatelessWidget {
               ProfileMenu(
                 onPressed: () {},
                 title: 'Name',
-                value: userModel.value.name,
+                value: userModel.value.name!,
               ),
               ProfileMenu(
                 onPressed: () {},

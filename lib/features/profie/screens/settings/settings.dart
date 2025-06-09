@@ -118,11 +118,13 @@ class UserProfileTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = UserController.instance.user;
+    final controller = Get.put(UserController());
+    final user = controller.user;
     return Obx(() =>ListTile(
       leading:  TRoundedImage(
-        imgUrl: user.value.profilePicture.isNotEmpty
-            ? user.value.profilePicture
+        isNetworkImage: user.value.profilePicture!.isNotEmpty? true: false,
+        imgUrl: user.value.profilePicture!.isNotEmpty
+            ? user.value.profilePicture??''
             : WatterImages.userImage,
         applyImageRadius: true,
         width: 50,
@@ -130,14 +132,15 @@ class UserProfileTile extends StatelessWidget {
         borderRadius: 50,
       ),
       title: Text(
-        user.value.name,
+        user.value.name!,
         style: Theme.of(context)
             .textTheme
             .headlineSmall
             ?.apply(color: WatterColors.white),
       ),
       subtitle: Text(
-          user.value.phoneNumber,
+        user.value.email.isEmpty?
+          user.value.phoneNumber: user.value.email,
         style: Theme.of(context)
             .textTheme
             .bodyMedium

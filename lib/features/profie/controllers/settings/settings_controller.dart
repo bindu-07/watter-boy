@@ -21,6 +21,7 @@ class UserController extends GetxController {
     try {
       final userRepo = Get.put(UserRepository());
       final fetchedUser = await userRepo.fetchUserData();
+      print('object ============> $fetchedUser');
       user.value = fetchedUser;
     } catch (e) {
       TLoaders.errorSnackBar(title: 'Error', message: e.toString());

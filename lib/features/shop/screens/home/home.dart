@@ -44,10 +44,10 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 children: [
                   LocationAppBar(),
-                  SizedBox(
-                    height: WatterSizes.spaceBtwSections,
-                  ),
-                  SearchContainer(),
+                  // SizedBox(
+                  //   height: WatterSizes.spaceBtwSections,
+                  // ),
+                  // SearchContainer(),
                   SizedBox(
                     height: WatterSizes.spaceBtwSections * 2,
                   ),

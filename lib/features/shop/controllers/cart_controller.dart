@@ -42,6 +42,8 @@ class CartController extends GetxController {
   final RxInt _total = 0.obs;
   RxInt get total => _total;
 
+  get selectedDeliveryBoy => null;
+
   void updateTotal() {
     _total.value = cartItems.values.fold(0, (sum, qty) => sum + qty);
   }

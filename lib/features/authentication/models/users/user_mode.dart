@@ -3,28 +3,41 @@ import 'package:water_boy/features/profie/models/address_model.dart';
 
 class UserModel {
   final String id;
-  final String name;
+  final String? name;
   final String email;
   final String phoneNumber;
-  final String profilePicture;
+  final String? profilePicture;
   final int userType;
   final String countryCode;
   final String deviceToken;
   final String deviceType;
   final UserLocation? location;
   final List<AddressModel>? addresses;
+  final bool? isAvailable;
+  final int? baseCharge;
+  final int? perFloreCharge;
+  final int? perKmCharge;
+  double? extraDistance;
+  final String? ratting;
 
-  UserModel({ this.addresses,
-       this.location,
+  UserModel(
+      {this.isAvailable,
+      this.baseCharge,
+      this.perFloreCharge,
+      this.perKmCharge,
+      this.addresses,
+      this.location,
       required this.userType,
       required this.countryCode,
       required this.deviceToken,
       required this.deviceType,
       required this.id,
-      required this.name,
+      this.name,
       required this.email,
       required this.phoneNumber,
-      required this.profilePicture});
+      this.profilePicture,
+        this.extraDistance,
+      this.ratting});
 
   static UserModel empty() => UserModel(
       userType: 0,
@@ -36,7 +49,8 @@ class UserModel {
       countryCode: '',
       deviceToken: '',
       deviceType: '',
-      location: null, addresses: []);
+      location: null,
+      addresses: [],);
 
   /// convert model to JSON structure for storing data in Firebase
   Map<String, dynamic> toJson() {
@@ -50,8 +64,53 @@ class UserModel {
       'deviceToken': deviceToken,
       'deviceType': deviceType,
       'location': location?.toMap(),
+      'isAvailable': isAvailable,
+      'baseCharge': baseCharge,
+      'ratting': ratting,
+      'perFloreCharge': perFloreCharge,
+      'perKmCharge': perKmCharge,
       'addresses': addresses?.map((a) => a.toMap()).toList(),
     };
+  }
+
+  UserModel copyWith({
+    String? id,
+    String? name,
+    String? email,
+    String? phoneNumber,
+    String? profilePicture,
+    int? userType,
+    String? countryCode,
+    String? deviceToken,
+    String? deviceType,
+    UserLocation? location,
+    List<AddressModel>? addresses,
+    bool? isAvailable,
+    int? baseCharge,
+    int? perFloreCharge,
+    int? perKmCharge,
+    double? extraDistance,
+    String? ratting,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      profilePicture: profilePicture ?? this.profilePicture,
+      userType: userType ?? this.userType,
+      countryCode: countryCode ?? this.countryCode,
+      deviceToken: deviceToken ?? this.deviceToken,
+      deviceType: deviceType ?? this.deviceType,
+      location: location ?? this.location,
+      addresses: addresses ?? this.addresses,
+      isAvailable: isAvailable ?? this.isAvailable,
+      baseCharge: baseCharge ?? this.baseCharge,
+      perFloreCharge: perFloreCharge ?? this.perFloreCharge,
+      perKmCharge: perKmCharge ?? this.perKmCharge,
+      extraDistance: extraDistance ?? this.extraDistance,
+      ratting: ratting?? this.ratting
+    );
   }
 
   factory UserModel.fromSnapShot(
@@ -63,17 +122,23 @@ class UserModel {
         name: data['fullName'] ?? '',
         email: data['email'] ?? '',
         phoneNumber: data['phoneNumber'] ?? '',
-        profilePicture: data['profilePicture'] ?? '',
+        profilePicture: data['ProfilePicture'] ?? '',
         userType: data['userType'] ?? 0,
         countryCode: data['countryCode'] ?? '',
         deviceToken: data['deviceToken'] ?? '',
         deviceType: data['deviceType'] ?? '',
+        isAvailable: data['isAvailable'] ?? true,
+        baseCharge: data['baseCharge'] ?? 0,
+        perFloreCharge: data['perFloreCharge'] ?? 0,
+        ratting: data['ratting']??'',
+        perKmCharge: data['perKmCharge'] ?? 0,
         location: data['location'] != null
             ? UserLocation.fromMap(data['location'])
             : null,
-        addresses: (data['addresses'] as List)
-            .map((a) => AddressModel.fromMap(a))
-            .toList(),
+        addresses: (data['addresses'] as List<dynamic>?)
+                ?.map((a) => AddressModel.fromMap(a))
+                .toList() ??
+            [],
       );
     } else {
       return UserModel.empty();
@@ -116,5 +181,3 @@ class UserLocation {
     };
   }
 }
-
-

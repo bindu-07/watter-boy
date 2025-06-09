@@ -51,10 +51,8 @@ class EmailController extends GetxController {
       /// save user data in Firebase FireStore
         final user = UserModel(
            id: userCredential.user!.uid,
-           name: "",
            email: email.text.trim(),
-           phoneNumber: "",
-           profilePicture: "", userType: 0, countryCode: "", deviceToken: "", deviceType: deviceType
+           phoneNumber: "", userType: 0, countryCode: "", deviceToken: "", deviceType: deviceType
        );
 
        final userRepo = Get.put(UserRepository());

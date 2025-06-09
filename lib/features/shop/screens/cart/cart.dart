@@ -6,6 +6,7 @@ import 'package:water_boy/features/shop/screens/checkout/checkout.dart';
 import 'package:water_boy/utils/constants/sizes.dart';
 
 import '../../controllers/cart_controller.dart';
+import '../checkout/delivery_boy.dart';
 import 'cart_item.dart';
 
 class CartScreen extends StatelessWidget {
@@ -24,7 +25,9 @@ class CartScreen extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.all(WatterSizes.defaultSpace),
           child: ElevatedButton(
-              onPressed: () => Get.to(() => const CheckoutScreen()),
+              onPressed: total != 0
+                  ? () => Get.to(() => const DeliveryBoy())
+                  : null,
               child: Text('Checkout ₹$total')),
         );
       }),

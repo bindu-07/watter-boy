@@ -34,18 +34,18 @@ class CheckoutScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /*const CartItems(
-                showAddRemoveButton: false,
-              ),
+              // const CartItems(
+              //   showAddRemoveButton: false,
+              // ),
               const SizedBox(
                 height: WatterSizes.spaceBtwSections,
-              ),*/
-              Text("Select a Delivery Boy",
+              ),
+              /*Text("Select a Delivery Boy",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(
                 height: WatterSizes.spaceBtwSections,
               ),
-              DeliveryBoySelector(),
+              DeliveryBoySelector(),*/
               const SizedBox(
                 height: WatterSizes.spaceBtwSections,
               ),
@@ -85,12 +85,14 @@ class CheckoutScreen extends StatelessWidget {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(WatterSizes.defaultSpace),
-        child: ElevatedButton(onPressed: ()=> Get.to(()=> SuccessScreen(
-          image: WatterImages.successfulPaymentIcon,
-          title: 'Payment Success',
-          subTittle: 'Your Watter refile within 10 min',
-          onPressed: ()=>  Get.offAll(() => const NavigationMenu()),
-        )), child: Text('Continue')),
+        child: ElevatedButton(
+            onPressed: () => Get.to(() => SuccessScreen(
+                  image: WatterImages.successfulPaymentIcon,
+                  title: 'Payment Success',
+                  subTittle: 'Your Watter refile within 10 min',
+                  onPressed: () => Get.offAll(() => const NavigationMenu()),
+                )),
+            child: Text('Order')),
       ),
     );
   }
@@ -113,17 +115,17 @@ class ShippingAddress extends StatelessWidget {
               'Shipping Address',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall!
-                  .apply(color: WatterHelperFunction.isDarkMode(context)
-                  ? Colors.white
-                  : WatterColors.black),
+              style: Theme.of(context).textTheme.headlineSmall!.apply(
+                  color: WatterHelperFunction.isDarkMode(context)
+                      ? Colors.white
+                      : WatterColors.black),
             ),
-            TextButton(onPressed: (){}, child: Text('Change'))
+            TextButton(onPressed: () {}, child: Text('Change'))
           ],
         ),
-        SizedBox(height: WatterSizes.spaceBtwItems / 2,),
+        SizedBox(
+          height: WatterSizes.spaceBtwItems / 2,
+        ),
         Text(
           'Bindu hait',
           maxLines: 1,
@@ -135,8 +137,14 @@ class ShippingAddress extends StatelessWidget {
         ),
         Row(
           children: [
-            Icon(Icons.phone,color: Colors.grey,size: 16, ),
-            SizedBox(width: WatterSizes.spaceBtwItems,),
+            Icon(
+              Icons.phone,
+              color: Colors.grey,
+              size: 16,
+            ),
+            SizedBox(
+              width: WatterSizes.spaceBtwItems,
+            ),
             Text(
               '+91 9330373008',
               style: Theme.of(context).textTheme.bodyMedium,
@@ -144,12 +152,18 @@ class ShippingAddress extends StatelessWidget {
           ],
         ),
         const SizedBox(
-          height: WatterSizes.spaceBtwItems / 2 ,
+          height: WatterSizes.spaceBtwItems / 2,
         ),
         Row(
           children: [
-            Icon(Icons.location_history,color: Colors.grey,size: 16, ),
-            SizedBox(width: WatterSizes.spaceBtwItems,),
+            Icon(
+              Icons.location_history,
+              color: Colors.grey,
+              size: 16,
+            ),
+            SizedBox(
+              width: WatterSizes.spaceBtwItems,
+            ),
             Expanded(
               child: Text(
                 'Singur Hooghly, india, 712223',
@@ -184,25 +198,30 @@ class BillingAddressSection extends StatelessWidget {
               style: Theme.of(context)
                   .textTheme
                   .headlineSmall!
-                  .apply(color: dark
-                  ? Colors.white
-                  : WatterColors.black),
+                  .apply(color: dark ? Colors.white : WatterColors.black),
             ),
-            TextButton(onPressed: (){}, child: Text('Change'))
+            TextButton(onPressed: () {}, child: Text('Change'))
           ],
         ),
-        SizedBox(height: WatterSizes.spaceBtwItems / 2,),
+        SizedBox(
+          height: WatterSizes.spaceBtwItems / 2,
+        ),
         Row(
           children: [
-            TRoundedContainer(width: 60, height: 35,
-            backgroundColor: dark? WatterColors.light: WatterColors.white,
+            TRoundedContainer(
+              width: 60,
+              height: 35,
+              backgroundColor: dark ? WatterColors.light : WatterColors.white,
               padding: EdgeInsets.all(WatterSizes.sm),
-              child: Image(image: AssetImage(WatterImages.paypal), fit: BoxFit.contain,),
+              child: Image(
+                image: AssetImage(WatterImages.paypal),
+                fit: BoxFit.contain,
+              ),
             ),
-            SizedBox(width: WatterSizes.spaceBtwItems / 2,),
-            Text('Paypale',style: Theme.of(context)
-                .textTheme
-                .bodyLarge)
+            SizedBox(
+              width: WatterSizes.spaceBtwItems / 2,
+            ),
+            Text('Paypale', style: Theme.of(context).textTheme.bodyLarge)
           ],
         )
       ],
