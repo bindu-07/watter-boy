@@ -27,6 +27,7 @@ import '../../../../data/repository/user/user_repository.dart';
 import '../../../../utils/helper/helper_function.dart';
 import '../../../../utils/popups/loaders.dart';
 import '../../../authentication/models/users/user_mode.dart';
+import '../../../profie/controllers/settings/settings_controller.dart';
 import '../../controllers/cart_controller.dart';
 import '../cart/cart_item.dart';
 
@@ -124,7 +125,8 @@ class ProductCardVertical extends StatelessWidget {
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
                 child: TRoundedImage(
                   imgUrl: product.image,
                   height: 160,
@@ -137,14 +139,18 @@ class ProductCardVertical extends StatelessWidget {
                 top: 8,
                 left: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.redAccent,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     "25% OFF",
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white),
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelMedium
+                        ?.copyWith(color: Colors.white),
                   ),
                 ),
               ),
@@ -161,7 +167,10 @@ class ProductCardVertical extends StatelessWidget {
                   product.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge
+                      ?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 6),
                 Row(
@@ -171,9 +180,9 @@ class ProductCardVertical extends StatelessWidget {
                     Text(
                       '₹${product.price}',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: WatterColors.primary,
-                      ),
+                            fontWeight: FontWeight.bold,
+                            color: WatterColors.primary,
+                          ),
                     ),
 
                     // Cart Actions
@@ -182,21 +191,24 @@ class ProductCardVertical extends StatelessWidget {
 
                       return quantity > 0
                           ? ProductQuantity(
-                        quantity: quantity,
-                        onAdd: () => cartController.addToCart(product),
-                        onRemove: () => cartController.removeFromCart(product),
-                        compact: false,
-                      )
+                              quantity: quantity,
+                              onAdd: () => cartController.addToCart(product),
+                              onRemove: () =>
+                                  cartController.removeFromCart(product),
+                              compact: true,
+                            )
                           : Container(
-                        decoration: BoxDecoration(
-                          color: WatterColors.primary,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Iconsax.add, color: Colors.white),
-                          onPressed: () => cartController.addToCart(product),
-                        ),
-                      );
+                              decoration: BoxDecoration(
+                                color: WatterColors.primary,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Iconsax.add,
+                                    color: Colors.white),
+                                onPressed: () =>
+                                    cartController.addToCart(product),
+                              ),
+                            );
                     }),
                   ],
                 ),
@@ -208,7 +220,6 @@ class ProductCardVertical extends StatelessWidget {
     );
   }
 }
-
 
 class SearchContainer extends StatelessWidget {
   const SearchContainer({
@@ -370,6 +381,8 @@ class _LocationAppBarState extends State<LocationAppBar> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(UserController());
+    final user = controller.user;
     return TAppBar(
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,10 +414,16 @@ class _LocationAppBarState extends State<LocationAppBar> {
         ],
       ),
       actions: [
-        IconButton(
+        TRoundedImage(
+          isNetworkImage: user.value.profilePicture!.isNotEmpty? true: false,
+          imgUrl: user.value.profilePicture!.isNotEmpty
+              ? user.value.profilePicture??''
+              : WatterImages.userImage,
+          applyImageRadius: true,
+          width: 36,
+          height: 36,
+          borderRadius: 36,
           onPressed: () => Get.to(() => const SettingsScreen()),
-          icon: const Icon(CupertinoIcons.profile_circled,
-              size: 36, color: Colors.white),
         )
       ],
     );

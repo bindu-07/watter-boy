@@ -183,6 +183,7 @@ class _DeliveryBoyState extends State<DeliveryBoy> {
                   ),
                   const SizedBox(height: 8),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _infoTag('Base: ₹${boy.baseCharge ?? 0}', context),
                       const SizedBox(width: 8),

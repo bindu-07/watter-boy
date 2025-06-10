@@ -42,11 +42,10 @@ class _AddressScreenState extends State<AddressScreen> {
           color: Colors.white,
         ),
       ),
-      appBar: TAppBar(
+      appBar: const TAppBar(
         showBackArrow: true,
         title: Text(
           'Address',
-          style: Theme.of(context).textTheme.headlineSmall,
         ),
       ),
       body: Obx(() =>ListView.builder(

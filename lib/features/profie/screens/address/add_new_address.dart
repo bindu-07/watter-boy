@@ -15,10 +15,9 @@ class AddNewAddressScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(AddressController());
     return Scaffold(
-      appBar: TAppBar(
+      appBar: const TAppBar(
         title: Text(
           'Add New Address',
-          style: Theme.of(context).textTheme.headlineSmall,
         ),
         showBackArrow: true,
       ),

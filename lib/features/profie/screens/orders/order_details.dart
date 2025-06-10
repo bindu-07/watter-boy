@@ -5,14 +5,17 @@ import 'package:water_boy/common/widgets/appbar.dart';
 import 'package:water_boy/utils/constants/sizes.dart';
 
 import '../../../../utils/constants/image_string.dart';
+import '../../models/order_model.dart';
 
 class OrderDetailsPage extends StatelessWidget {
-  const OrderDetailsPage({super.key});
+  const OrderDetailsPage({super.key, required this.order});
 
-  final int currentStep = 2; // 0: Placed, 1: In Progress, 2: Out for Delivery, 3: Delivered
+  final OrderModel order;
+
 
   @override
   Widget build(BuildContext context) {
+     int currentStep = order.status; // 0: Placed, 1: In Progress, 2: Out for Delivery, 3: Delivered
     return Scaffold(
       appBar: const TAppBar(
         title: Text("Order Details"), showBackArrow: true,),
@@ -24,7 +27,7 @@ class OrderDetailsPage extends StatelessWidget {
             /// Order Info
             Card(
               child: ListTile(
-                title: const Text("Order ID: #WTR-239840"),
+                title: Text("Order ID: #${order.id}"),
                 subtitle: const Text("Placed on: May 18, 2025"),
                 trailing: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

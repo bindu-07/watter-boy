@@ -17,6 +17,7 @@ import '../../../../utils/constants/image_string.dart';
 import '../../../../utils/constants/sizes.dart';
 import '../../../shop/screens/home/home.dart';
 import '../../controllers/address/address_select_controller.dart';
+import '../../controllers/orders/orders_controller.dart';
 import '../../controllers/settings/settings_controller.dart';
 import '../address/add_new_address.dart';
 
@@ -85,7 +86,8 @@ class SettingsScreen extends StatelessWidget {
                     icon: Iconsax.shopping_cart,
                     title: 'My Orders',
                     subtitle: 'In-progress and complete orders',
-                    onTab: () => Get.to(() => OrdersScreen()),
+                    onTab: () { Get.put(OrdersController());
+                      Get.to(() => OrdersScreen());}
                   ),
                   /*SettingsMenuTile(icon: Iconsax.safe_home, title: 'My Address', subtitle: 'Set Delivery address',trailing: Switch(value: false, onChanged: (value) {}),),*/
                   // Logout Button

@@ -7,6 +7,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:water_boy/features/profie/models/address_model.dart';
 
+import '../../../features/shop/controllers/cart_controller.dart';
 import '../../../utils/exceptions/firebase_exceptions.dart';
 import '../../../utils/exceptions/format_exceptions.dart';
 import '../../../utils/exceptions/platform_exceptions.dart';
@@ -29,6 +30,7 @@ class AddressRepository extends GetxController {
       currentAddresses = currentAddresses.map((a) {
         final map = Map<String, dynamic>.from(a);
         map['isSelected'] = false;
+        CartController.instance.selectedAddress.value = address;
         return map;
       }).toList();
 

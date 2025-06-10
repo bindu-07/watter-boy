@@ -42,4 +42,16 @@ class AddressModel {
       'createdAt': Timestamp.fromDate(createdAt)
     };
   }
+  /// Creates an empty AddressModel
+  factory AddressModel.empty() {
+    return AddressModel(
+      receiverName: '',
+      receiverNumber: '',
+      house: '',
+      floor: '',
+      landmark: '',
+      isSelected: false,
+      createdAt: DateTime.now(),
+    );
+  }
 }

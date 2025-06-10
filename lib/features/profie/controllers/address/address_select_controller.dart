@@ -8,6 +8,7 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import '../../../../utils/constants/image_string.dart';
 import '../../../../utils/popups/full_screen_loader.dart';
 import '../../../../utils/popups/loaders.dart';
+import '../../../shop/controllers/cart_controller.dart';
 import '../../models/address_model.dart';
 
 class SelectAddressController extends GetxController {
@@ -37,6 +38,12 @@ class SelectAddressController extends GetxController {
           .toList();
       print('object =======> ${addressModels.length}');
       addresses.assignAll(addressModels);
+      // Set the selected address into CartController
+      final selected = addresses.firstWhereOrNull((a) => a.isSelected);
+      if (selected != null) {
+        CartController.instance.selectedAddress.value = selected;
+      }
+
       // TFullScreenLoader.stopLoading();
     } catch (e) {
       TFullScreenLoader.stopLoading();
@@ -65,7 +72,7 @@ class SelectAddressController extends GetxController {
     await _db.collection('users').doc(uid).update({
       'addresses': addresses.map((e) => e.toMap()).toList(),
     });
-
+    CartController.instance.selectedAddress.value = addresses[index];
     addresses.refresh();
   }
 

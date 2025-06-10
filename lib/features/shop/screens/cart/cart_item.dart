@@ -74,7 +74,7 @@ class ProductQuantity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final buttonSize = compact ? 26.0 : 32.0;
-    final iconSize = compact ? WatterSizes.sm : WatterSizes.md;
+    final iconSize = compact ? WatterSizes.iconXs : WatterSizes.md;
     final spacing = compact ? 6.0 : WatterSizes.spaceBtwItems;
 
     return Row(

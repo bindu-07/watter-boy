@@ -9,6 +9,7 @@ import '../../../profie/controllers/address/address_select_controller.dart';
 import '../../../profie/screens/address/add_new_address.dart';
 import '../../../profie/screens/address/address.dart';
 import '../../controllers/cart_controller.dart';
+import '../../controllers/order_controller.dart';
 import '../../models/product_model.dart';
 
 class CheckoutScreen extends StatelessWidget {
@@ -21,7 +22,6 @@ class CheckoutScreen extends StatelessWidget {
     final cartItems = cartController.cartItems;
     final addressController = Get.put(SelectAddressController());
     final selectedAddress = CartController.instance.selectedAddress;
-
 
     if (selectedDeliveryBoy == null) {
       return const Scaffold(
@@ -42,110 +42,152 @@ class CheckoutScreen extends StatelessWidget {
         title: const Text("Checkout"),
         showBackArrow: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Cart Items
-            Text("Items", style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 12),
-            ...cartItems.entries.map((entry) {
-              final ProductModel product = entry.key;
-              final int quantity = entry.value;
-              return ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(product.name),
-                subtitle: Text("₹${product.price} x $quantity"),
-                trailing: Text("₹${int.parse(product.price) * quantity}"),
-              );
-            }),
-
-            const Divider(height: 32),
-
-            // Delivery Boy Info
-            Text("Delivery By", style: Theme.of(context).textTheme.titleLarge),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: CircleAvatar(
-                backgroundImage: selectedDeliveryBoy.value?.profilePicture !=
-                        null
-                    ? NetworkImage(selectedDeliveryBoy.value!.profilePicture!)
-                    : null,
-                child: selectedDeliveryBoy.value?.profilePicture == null
-                    ? const Icon(Icons.person)
-                    : null,
-              ),
-              title: Text(selectedDeliveryBoy.value?.name ?? "No Name"),
-              subtitle: Text(
-                "${selectedDeliveryBoy.value?.baseCharge} Base + ${selectedDeliveryBoy.value?.perKmCharge} /km",
-              ),
-              trailing: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("${deliveryDistance.toStringAsFixed(1)} km"),
-                  Text("₹$deliveryCharge",
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  // 🛒 Cart Items
+                  _buildSectionTitle("Items", context),
+                  const SizedBox(height: 12),
+                  ...cartItems.entries.map((entry) {
+                    final ProductModel product = entry.key;
+                    final int quantity = entry.value;
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      child: ListTile(
+                        leading: CircleAvatar(child: Text('x$quantity')),
+                        title: Text(product.name),
+                        subtitle: Text("₹${product.price} each"),
+                        trailing: Text(
+                          "₹${int.parse(product.price) * quantity}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    );
+                  }),
+
+                  const SizedBox(height: 20),
+
+                  // 🚴 Delivery Boy Info
+                  _buildSectionTitle("Delivery By", context),
+                  Card(
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        radius: 24,
+                        backgroundImage:
+                            selectedDeliveryBoy.value?.profilePicture != null
+                                ? NetworkImage(
+                                    selectedDeliveryBoy.value!.profilePicture!)
+                                : null,
+                        child: selectedDeliveryBoy.value?.profilePicture == null
+                            ? const Icon(Icons.person)
+                            : null,
+                      ),
+                      title: Text(selectedDeliveryBoy.value?.name ?? "No Name"),
+                      subtitle: Text(
+                        "${selectedDeliveryBoy.value?.baseCharge} Base + ${selectedDeliveryBoy.value?.perKmCharge} /km",
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("${deliveryDistance.toStringAsFixed(1)} km"),
+                          Text("₹$deliveryCharge",
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // 💳 Payment Method
+                  _buildSectionTitle("Payment Method", context),
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.money),
+                      title: const Text("Pay on Delivery"),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // 📦 Order Summary
+                  _buildSectionTitle("Summary", context),
+                  const SizedBox(height: 8),
+                  _buildSummaryRow("Items Total", "₹$itemsTotal", context),
+                  _buildSummaryRow(
+                      "Delivery Charges", "₹$deliveryCharge", context),
+                  const Divider(),
+                  _buildSummaryRow("Grand Total", "₹$grandTotal", context,
+                      bold: true),
+
+                  const SizedBox(height: 20),
+
+                  // 🏠 Delivery Address
+                  _buildSectionTitle("Delivery Address", context),
+                  Obx(() {
+                    final address = cartController.selectedAddress.value;
+                    return Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      child: ListTile(
+                        title: Text(
+                            address?.receiverName ?? "No address selected"),
+                        subtitle: address != null
+                            ? Text(
+                                '${address.house}, ${address.floor}, ${address.landmark}')
+                            : const Text('Please select a delivery address'),
+                        trailing: TextButton(
+                          onPressed: () => _showAddressBottomSheet(context),
+                          child: const Text("Change"),
+                        ),
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
+          ),
 
-            const Divider(height: 32),
+          // ✅ Bottom CTA Button
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Obx(() {
+              final selectedAddress = cartController.selectedAddress.value;
+              final deliveryBoy = cartController.selectedDeliveryBoy.value;
 
-            // Payment Info
-            Text("Payment Method",
-                style: Theme.of(context).textTheme.titleLarge),
-            const ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Icon(Icons.money),
-              title: Text("Pay on Delivery"),
-            ),
+              final isPlaceOrderEnabled =
+                  selectedAddress != null && deliveryBoy != null;
 
-            const Divider(height: 32),
-
-            // Summary
-            Text("Summary", style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            _buildSummaryRow("Items Total", "₹$itemsTotal", context),
-            _buildSummaryRow("Delivery Charges", "₹$deliveryCharge", context),
-            const SizedBox(height: 8),
-            _buildSummaryRow("Grand Total", "₹$grandTotal", context,
-                bold: true),
-            // Delivery Address
-            const Divider(height: 32),
-            Text("Delivery Address", style: Theme.of(context).textTheme.titleLarge),
-            Obx(() {
-              final address = cartController.selectedAddress.value;
-              return ListTile(
-                title: Text(address?.receiverName ?? "No address selected"),
-                subtitle: address != null
-                    ? Text('${address.house}, ${address.floor}, ${address.landmark}')
-                    : const Text('Please select a delivery address'),
-                trailing: TextButton(
-                  onPressed: () => _showAddressBottomSheet(context),
-                  child: const Text("Change"),
+              return SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: isPlaceOrderEnabled
+                      ? () async {
+                          final controller = Get.put(OrderController());
+                          await controller.placeOrder();
+                        }
+                      : null,
+                  icon: const Icon(Icons.check_circle),
+                  label: const Text("Place Order"),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: Colors.green,
+                    textStyle: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ),
               );
             }),
-
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: cartController.selectedAddress.value == null
-                  ? null
-                  : () => Get.to(() => SuccessScreen(
-                image: WatterImages.successfulPaymentIcon,
-                title: 'Payment Success',
-                subTittle: 'Your Watter will be refilled within 10 min',
-                onPressed: () => Get.offAll(() => const NavigationMenu()),
-              )),
-              icon: const Icon(Icons.check_circle),
-              label: const Text("Place Order"),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(50),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -169,6 +211,7 @@ class CheckoutScreen extends StatelessWidget {
       ),
     );
   }
+
   void _showAddressBottomSheet(BuildContext context) {
     final addressController = Get.put(SelectAddressController());
 
@@ -206,14 +249,18 @@ class CheckoutScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("Select Delivery Address", style: TextStyle(fontSize: 18)),
+              const Text("Select Delivery Address",
+                  style: TextStyle(fontSize: 18)),
               const SizedBox(height: 12),
               ...List.generate(addresses.length, (index) {
                 final address = addresses[index];
                 return ListTile(
                   title: Text(address.receiverName),
-                  subtitle: Text('${address.house}, ${address.floor}, ${address.landmark}'),
-                  leading: Icon(address.isSelected ? Icons.check_circle : Icons.location_on),
+                  subtitle: Text(
+                      '${address.house}, ${address.floor}, ${address.landmark}'),
+                  leading: Icon(address.isSelected
+                      ? Icons.check_circle
+                      : Icons.location_on),
                   onTap: () async {
                     await addressController.selectAddress(index);
                     CartController.instance.selectedAddress.value = address;
@@ -228,5 +275,12 @@ class CheckoutScreen extends StatelessWidget {
     );
   }
 
-
+  Widget _buildSectionTitle(String title, BuildContext context) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+    );
+  }
 }
