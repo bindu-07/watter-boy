@@ -84,11 +84,10 @@ class _DeliveryBoyState extends State<DeliveryBoy> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: TAppBar(
+      appBar: const TAppBar(
         showBackArrow: true,
         title: Text(
           'Select Delivery Boy',
-          style: Theme.of(context).textTheme.headlineSmall,
         ),
       ),
       body: _loading
@@ -109,7 +108,7 @@ class _DeliveryBoyState extends State<DeliveryBoy> {
             return _buildDeliveryBoyCard(boy, isSelected, () {
               setState(() => _selectedIndex = index);
               // Optionally store selectedUser in controller:
-              cartController.selectedDeliveryBoy.value = boy;
+              cartController.selectedDeliveryBoy.value = _deliveryBoys[_selectedIndex!];
             });
           },
         ),

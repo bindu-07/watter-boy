@@ -1,297 +1,232 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:water_boy/common/widgets/appbar.dart';
-import 'package:water_boy/common/widgets/rounded_container.dart';
-import 'package:water_boy/common/widgets/success_screen.dart';
-import 'package:water_boy/features/shop/screens/cart/cart_item.dart';
-import 'package:water_boy/features/shop/screens/checkout/select_delivery_boy.dart';
-import 'package:water_boy/navigation_menu.dart';
-import 'package:water_boy/utils/constants/colors.dart';
-import 'package:water_boy/utils/constants/image_string.dart';
-import 'package:water_boy/utils/constants/sizes.dart';
-import 'package:water_boy/utils/helper/helper_function.dart';
+import '../../../../common/widgets/appbar.dart';
+import '../../../../common/widgets/success_screen.dart';
+import '../../../../navigation_menu.dart';
+import '../../../../utils/constants/image_string.dart';
+import '../../../authentication/models/users/user_mode.dart';
+import '../../../profie/controllers/address/address_select_controller.dart';
+import '../../../profie/screens/address/add_new_address.dart';
+import '../../../profie/screens/address/address.dart';
+import '../../controllers/cart_controller.dart';
+import '../../models/product_model.dart';
 
 class CheckoutScreen extends StatelessWidget {
   const CheckoutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final dark = WatterHelperFunction.isDarkMode(context);
+    final cartController = CartController.instance;
+    final selectedDeliveryBoy = cartController.selectedDeliveryBoy;
+    final cartItems = cartController.cartItems;
+    final addressController = Get.put(SelectAddressController());
+    final selectedAddress = CartController.instance.selectedAddress;
+
+
+    if (selectedDeliveryBoy == null) {
+      return const Scaffold(
+        body: Center(child: Text("No delivery boy selected.")),
+      );
+    }
+
+    final deliveryDistance = selectedDeliveryBoy.value?.extraDistance ?? 0;
+    final deliveryCharge = (selectedDeliveryBoy.value?.baseCharge ?? 0) +
+        ((selectedDeliveryBoy.value?.perKmCharge ?? 0) * deliveryDistance)
+            .round();
+
+    final itemsTotal = cartController.getTotalAmount();
+    final grandTotal = itemsTotal + deliveryCharge;
+
     return Scaffold(
       appBar: TAppBar(
+        title: const Text("Checkout"),
         showBackArrow: true,
-        title: Text(
-          'Order Review',
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(WatterSizes.defaultSpace),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // const CartItems(
-              //   showAddRemoveButton: false,
-              // ),
-              const SizedBox(
-                height: WatterSizes.spaceBtwSections,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Cart Items
+            Text("Items", style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 12),
+            ...cartItems.entries.map((entry) {
+              final ProductModel product = entry.key;
+              final int quantity = entry.value;
+              return ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(product.name),
+                subtitle: Text("₹${product.price} x $quantity"),
+                trailing: Text("₹${int.parse(product.price) * quantity}"),
+              );
+            }),
+
+            const Divider(height: 32),
+
+            // Delivery Boy Info
+            Text("Delivery By", style: Theme.of(context).textTheme.titleLarge),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: CircleAvatar(
+                backgroundImage: selectedDeliveryBoy.value?.profilePicture !=
+                        null
+                    ? NetworkImage(selectedDeliveryBoy.value!.profilePicture!)
+                    : null,
+                child: selectedDeliveryBoy.value?.profilePicture == null
+                    ? const Icon(Icons.person)
+                    : null,
               ),
-              /*Text("Select a Delivery Boy",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(
-                height: WatterSizes.spaceBtwSections,
+              title: Text(selectedDeliveryBoy.value?.name ?? "No Name"),
+              subtitle: Text(
+                "${selectedDeliveryBoy.value?.baseCharge} Base + ${selectedDeliveryBoy.value?.perKmCharge} /km",
               ),
-              DeliveryBoySelector(),*/
-              const SizedBox(
-                height: WatterSizes.spaceBtwSections,
+              trailing: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text("${deliveryDistance.toStringAsFixed(1)} km"),
+                  Text("₹$deliveryCharge",
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                ],
               ),
-              TRoundedContainer(
-                showBorder: true,
-                padding: EdgeInsets.all(WatterSizes.md),
-                backgroundColor: dark ? Colors.black : Colors.white,
-                child: Column(
-                  children: [
-                    ///pricing
+            ),
 
-                    BillingPayment(),
-                    const SizedBox(
-                      height: WatterSizes.spaceBtwItems,
-                    ),
+            const Divider(height: 32),
 
-                    ///Devider
-                    Divider(),
-                    const SizedBox(
-                      height: WatterSizes.spaceBtwItems,
-                    ),
+            // Payment Info
+            Text("Payment Method",
+                style: Theme.of(context).textTheme.titleLarge),
+            const ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.money),
+              title: Text("Pay on Delivery"),
+            ),
 
-                    ///Payment Method
-                    BillingAddressSection(),
-                    const SizedBox(
-                      height: WatterSizes.spaceBtwItems,
-                    ),
+            const Divider(height: 32),
 
-                    ///Address
-                    ShippingAddress()
-                  ],
+            // Summary
+            Text("Summary", style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 8),
+            _buildSummaryRow("Items Total", "₹$itemsTotal", context),
+            _buildSummaryRow("Delivery Charges", "₹$deliveryCharge", context),
+            const SizedBox(height: 8),
+            _buildSummaryRow("Grand Total", "₹$grandTotal", context,
+                bold: true),
+            // Delivery Address
+            const Divider(height: 32),
+            Text("Delivery Address", style: Theme.of(context).textTheme.titleLarge),
+            Obx(() {
+              final address = cartController.selectedAddress.value;
+              return ListTile(
+                title: Text(address?.receiverName ?? "No address selected"),
+                subtitle: address != null
+                    ? Text('${address.house}, ${address.floor}, ${address.landmark}')
+                    : const Text('Please select a delivery address'),
+                trailing: TextButton(
+                  onPressed: () => _showAddressBottomSheet(context),
+                  child: const Text("Change"),
                 ),
-              )
+              );
+            }),
+
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: cartController.selectedAddress.value == null
+                  ? null
+                  : () => Get.to(() => SuccessScreen(
+                image: WatterImages.successfulPaymentIcon,
+                title: 'Payment Success',
+                subTittle: 'Your Watter will be refilled within 10 min',
+                onPressed: () => Get.offAll(() => const NavigationMenu()),
+              )),
+              icon: const Icon(Icons.check_circle),
+              label: const Text("Place Order"),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryRow(String label, String amount, BuildContext context,
+      {bool bold = false}) {
+    final style = bold
+        ? Theme.of(context)
+            .textTheme
+            .titleMedium!
+            .copyWith(fontWeight: FontWeight.bold)
+        : Theme.of(context).textTheme.bodyMedium;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: style),
+          Text(amount, style: style),
+        ],
+      ),
+    );
+  }
+  void _showAddressBottomSheet(BuildContext context) {
+    final addressController = Get.put(SelectAddressController());
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => Obx(() {
+        final addresses = addressController.addresses;
+        if (addresses.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text("No addresses found."),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () async {
+                    await Get.to(() => const AddNewAddressScreen());
+                    addressController.fetchAddresses();
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Add New Address"),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Select Delivery Address", style: TextStyle(fontSize: 18)),
+              const SizedBox(height: 12),
+              ...List.generate(addresses.length, (index) {
+                final address = addresses[index];
+                return ListTile(
+                  title: Text(address.receiverName),
+                  subtitle: Text('${address.house}, ${address.floor}, ${address.landmark}'),
+                  leading: Icon(address.isSelected ? Icons.check_circle : Icons.location_on),
+                  onTap: () async {
+                    await addressController.selectAddress(index);
+                    CartController.instance.selectedAddress.value = address;
+                    Navigator.pop(context);
+                  },
+                );
+              }),
             ],
           ),
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(WatterSizes.defaultSpace),
-        child: ElevatedButton(
-            onPressed: () => Get.to(() => SuccessScreen(
-                  image: WatterImages.successfulPaymentIcon,
-                  title: 'Payment Success',
-                  subTittle: 'Your Watter refile within 10 min',
-                  onPressed: () => Get.offAll(() => const NavigationMenu()),
-                )),
-            child: Text('Order')),
-      ),
+        );
+      }),
     );
   }
-}
 
-class ShippingAddress extends StatelessWidget {
-  const ShippingAddress({
-    super.key,
-  });
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Shipping Address',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.headlineSmall!.apply(
-                  color: WatterHelperFunction.isDarkMode(context)
-                      ? Colors.white
-                      : WatterColors.black),
-            ),
-            TextButton(onPressed: () {}, child: Text('Change'))
-          ],
-        ),
-        SizedBox(
-          height: WatterSizes.spaceBtwItems / 2,
-        ),
-        Text(
-          'Bindu hait',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(
-          height: WatterSizes.spaceBtwItems / 2,
-        ),
-        Row(
-          children: [
-            Icon(
-              Icons.phone,
-              color: Colors.grey,
-              size: 16,
-            ),
-            SizedBox(
-              width: WatterSizes.spaceBtwItems,
-            ),
-            Text(
-              '+91 9330373008',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
-        const SizedBox(
-          height: WatterSizes.spaceBtwItems / 2,
-        ),
-        Row(
-          children: [
-            Icon(
-              Icons.location_history,
-              color: Colors.grey,
-              size: 16,
-            ),
-            SizedBox(
-              width: WatterSizes.spaceBtwItems,
-            ),
-            Expanded(
-              child: Text(
-                'Singur Hooghly, india, 712223',
-                softWrap: true,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class BillingAddressSection extends StatelessWidget {
-  const BillingAddressSection({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final dark = WatterHelperFunction.isDarkMode(context);
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Payment Method',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall!
-                  .apply(color: dark ? Colors.white : WatterColors.black),
-            ),
-            TextButton(onPressed: () {}, child: Text('Change'))
-          ],
-        ),
-        SizedBox(
-          height: WatterSizes.spaceBtwItems / 2,
-        ),
-        Row(
-          children: [
-            TRoundedContainer(
-              width: 60,
-              height: 35,
-              backgroundColor: dark ? WatterColors.light : WatterColors.white,
-              padding: EdgeInsets.all(WatterSizes.sm),
-              child: Image(
-                image: AssetImage(WatterImages.paypal),
-                fit: BoxFit.contain,
-              ),
-            ),
-            SizedBox(
-              width: WatterSizes.spaceBtwItems / 2,
-            ),
-            Text('Paypale', style: Theme.of(context).textTheme.bodyLarge)
-          ],
-        )
-      ],
-    );
-  }
-}
-
-class BillingPayment extends StatelessWidget {
-  const BillingPayment({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        /// subTotal
-        Row(
-          children: [
-            Expanded(
-                child: Text(
-              'Subtotal',
-              style: Theme.of(context).textTheme.bodyMedium,
-            )),
-            Text(
-              '\$234',
-              style: Theme.of(context).textTheme.labelLarge,
-            )
-          ],
-        ),
-        const SizedBox(
-          height: WatterSizes.spaceBtwItems / 2,
-        ),
-
-        /// Shipping Charge
-        Row(
-          children: [
-            Expanded(
-                child: Text(
-              'Shipping Fee',
-              style: Theme.of(context).textTheme.bodyMedium,
-            )),
-            Text(
-              '\$24',
-              style: Theme.of(context).textTheme.labelLarge,
-            )
-          ],
-        ),
-        const SizedBox(
-          height: WatterSizes.spaceBtwItems / 2,
-        ),
-
-        /// order Total
-        Row(
-          children: [
-            Expanded(
-                child: Text(
-              'Order Total',
-              style: Theme.of(context).textTheme.bodyMedium,
-            )),
-            Text(
-              '\$234',
-              style: Theme.of(context).textTheme.titleMedium,
-            )
-          ],
-        ),
-        const SizedBox(
-          height: WatterSizes.spaceBtwItems / 2,
-        ),
-      ],
-    );
-  }
 }
