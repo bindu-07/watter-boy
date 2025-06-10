@@ -1,25 +1,59 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:water_boy/common/widgets/appbar.dart';
 import 'package:water_boy/utils/constants/sizes.dart';
 
 import '../../../../utils/constants/image_string.dart';
+import '../../../authentication/models/users/user_mode.dart';
 import '../../models/order_model.dart';
 
-class OrderDetailsPage extends StatelessWidget {
+class OrderDetailsPage extends StatefulWidget {
   const OrderDetailsPage({super.key, required this.order});
 
   final OrderModel order;
 
+  @override
+  State<OrderDetailsPage> createState() => _OrderDetailsPageState();
+}
+
+class _OrderDetailsPageState extends State<OrderDetailsPage> {
+  UserModel? deliveryBoy;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDeliveryBoy();
+  }
+
+  Future<void> fetchDeliveryBoy() async {
+    final doc = await FirebaseFirestore.instance.collection('users').doc(widget.order.deliveryBoyId).get();
+    if (doc.exists) {
+      setState(() {
+        deliveryBoy = UserModel.fromSnapShot(doc);
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-     int currentStep = order.status; // 0: Placed, 1: In Progress, 2: Out for Delivery, 3: Delivered
+    final order = widget.order;
+    int currentStep = order.status;
+
     return Scaffold(
-      appBar: const TAppBar(
-        title: Text("Order Details"), showBackArrow: true,),
-      body: SingleChildScrollView(
+      appBar: const TAppBar(title: Text("Order Details"), showBackArrow: true),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         padding: const EdgeInsets.all(WatterSizes.spaceBtwItems),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,7 +62,7 @@ class OrderDetailsPage extends StatelessWidget {
             Card(
               child: ListTile(
                 title: Text("Order ID: #${order.id}"),
-                subtitle: const Text("Placed on: May 18, 2025"),
+                subtitle: Text("Placed on: ${DateFormat('d MMM y, h:mm a').format(order.createdAt)}"),
                 trailing: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
@@ -45,7 +79,6 @@ class OrderDetailsPage extends StatelessWidget {
             /// Order Progress
             Text("Order Status", style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
-
             Stepper(
               currentStep: currentStep,
               controlsBuilder: (_, __) => const SizedBox.shrink(),
@@ -79,34 +112,83 @@ class OrderDetailsPage extends StatelessWidget {
 
             const SizedBox(height: WatterSizes.defaultSpace),
 
-            /// Items Summary
+            /// Items List
             Text("Items", style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             Card(
               child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Iconsax.box),
-                    title: const Text("Mineral Water - 20L"),
-                    trailing: const Text("x2"),
-                  ),
-                  const Divider(),
-                  ListTile(
-                    leading: const Icon(Iconsax.box),
-                    title: const Text("Mineral Water - 5L"),
-                    trailing: const Text("x1"),
-                  ),
-                ],
+                children: order.items.map((item) {
+                  return Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Iconsax.box),
+                        title: Text(item.name),
+                        trailing: Text("x${item.quantity}"),
+                      ),
+                      if (item != order.items.last) const Divider(),
+                    ],
+                  );
+                }).toList(),
               ),
             ),
 
             const SizedBox(height: WatterSizes.defaultSpace),
 
-            /// Total Summary
+            /// Delivery Boy
+            Text("Delivery Person", style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 8),
+            if (deliveryBoy != null)
+              Card(
+                child: ListTile(
+                  leading: const Icon(Iconsax.user),
+                  title: Text(deliveryBoy!.name!),
+                  subtitle: Text("Phone: ${deliveryBoy!.phoneNumber}"),
+                  trailing: IconButton(
+                    icon: const Icon(Iconsax.call),
+                    onPressed: () {
+                      final phone = deliveryBoy!.phoneNumber;
+                      launchUrl(Uri.parse("tel:$phone"));
+                    },
+                  ),
+                ),
+              ),
+
+            const SizedBox(height: WatterSizes.defaultSpace),
+
+            /// Delivery Address
+            Text("Delivery Address", style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 8),
             Card(
               child: ListTile(
-                title: const Text("Total Amount"),
-                trailing: Text("₹210", style: Theme.of(context).textTheme.titleMedium),
+                leading: const Icon(Iconsax.location),
+                title: Text(order.deliveryAddress.house),
+              ),
+            ),
+
+            const SizedBox(height: WatterSizes.defaultSpace),
+
+            /// Payment Summary
+            Text("Summary", style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 8),
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    title: const Text("Payment Mode"),
+                    trailing: Text(order.paymentMode),
+                  ),
+                  ListTile(
+                    title: const Text("Delivery Charge"),
+                    trailing: Text("₹${order.deliveryCharge.toStringAsFixed(2)}"),
+                  ),
+                  ListTile(
+                    title: const Text("Total Amount"),
+                    trailing: Text(
+                      "₹${order.totalAmount.toStringAsFixed(2)}",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -115,3 +197,4 @@ class OrderDetailsPage extends StatelessWidget {
     );
   }
 }
+

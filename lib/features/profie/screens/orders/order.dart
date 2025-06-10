@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:water_boy/common/widgets/rounded_container.dart';
 import 'package:water_boy/features/profie/screens/orders/order_details.dart';
 import 'package:water_boy/utils/constants/colors.dart';
@@ -41,6 +42,9 @@ class OrderListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = WatterHelperFunction.isDarkMode(context);
     final controller = Get.put(OrdersController());
+    String formatDate(DateTime dateTime) {
+      return DateFormat('d MMM y h:mm a').format(dateTime);
+    }
     return Obx(() {
       if (controller.userOrders.isEmpty) {
         return const Center(child: Text("No orders found."));
@@ -81,7 +85,7 @@ class OrderListItem extends StatelessWidget {
                                 .apply(color: WatterColors.primary,
                                 fontWeightDelta: 1),
                           ),
-                          Text('${order.createdAt.toString()}',
+                          Text('${formatDate(order.createdAt)}',
                             style: Theme
                                 .of(context)
                                 .textTheme

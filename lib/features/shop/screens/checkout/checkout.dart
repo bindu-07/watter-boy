@@ -74,6 +74,7 @@ class CheckoutScreen extends StatelessWidget {
 
                   // 🚴 Delivery Boy Info
                   _buildSectionTitle("Delivery By", context),
+                  const SizedBox(height: 12),
                   Card(
                     child: ListTile(
                       leading: CircleAvatar(
@@ -108,6 +109,7 @@ class CheckoutScreen extends StatelessWidget {
 
                   // 💳 Payment Method
                   _buildSectionTitle("Payment Method", context),
+                  const SizedBox(height: 12),
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.money),
@@ -131,6 +133,7 @@ class CheckoutScreen extends StatelessWidget {
 
                   // 🏠 Delivery Address
                   _buildSectionTitle("Delivery Address", context),
+                  const SizedBox(height: 12),
                   Obx(() {
                     final address = cartController.selectedAddress.value;
                     return Card(
