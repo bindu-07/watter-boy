@@ -27,6 +27,7 @@ dependencies:
   connectivity_plus: ^5.0.1
   flutter_native_splash: ^2.3.2
   smooth_page_indicator: ^1.1.0
+  flutter_rating_bar: ^4.0.1
 
   #stroe flutter_state_management:
   get: ^4.6.5
@@ -35,6 +36,7 @@ dependencies:
   firebase_auth: ^5.5.3
   cloud_firestore: ^5.6.7
   google_sign_in: ^6.3.0
+  firebase_messaging: ^15.2.7
 
 #Use Geolocator + Geocoding packages
   geolocator: ^10.1.0

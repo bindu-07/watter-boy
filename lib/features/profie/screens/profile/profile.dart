@@ -43,23 +43,26 @@ class ProfileScreen extends StatelessWidget {
                 width: double.infinity,
                 child: Column(
                   children: [
-                    const TRoundedImage(
-                      imgUrl: WatterImages.userImage,
+                    TRoundedImage(
+                      isNetworkImage: userModel.value.profilePicture!.isNotEmpty? true: false,
+                      imgUrl: userModel.value.profilePicture!.isNotEmpty
+                          ? userModel.value.profilePicture??''
+                          : WatterImages.userImage,
                       width: 80,
                       height: 80,
                       borderRadius: 80,
                     ),
-                    TextButton(
+                    /*TextButton(
                         onPressed: () {},
-                        child: const Text('Change Profile Picture')),
+                        child: const Text('Change Profile Picture')),*/
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: WatterSizes.spaceBtwSections / 2,
               ),
               Divider(),
-              SizedBox(
+              const SizedBox(
                 height: WatterSizes.spaceBtwSections,
               ),
               Row(
@@ -78,17 +81,56 @@ class ProfileScreen extends StatelessWidget {
                 height: WatterSizes.spaceBtwSections,
               ),
               ProfileMenu(
-                onPressed: () {},
+                onPressed: () {
+                  showEditDialog(
+                    context: context,
+                    title: "Edit Name",
+                    initialValue: userModel.value.name!,
+                    onSave: (newValue) async {
+                      userModel.value.name = newValue;
+                      await UserRepository.instance.updateSingleFiled({
+                        'fullName': userModel.value.name,
+                      });
+                      userModel.refresh(); // Refresh the UI
+                    },
+                  );
+                },
                 title: 'Name',
                 value: userModel.value.name!,
               ),
               ProfileMenu(
-                onPressed: () {},
+                onPressed: () {
+                  showEditDialog(
+                    context: context,
+                    title: "Edit E-mail",
+                    initialValue: userModel.value.email,
+                    onSave: (newValue) async {
+                      userModel.value.email = newValue;
+                      await UserRepository.instance.updateSingleFiled({
+                        'email': userModel.value.email,
+                      });
+                      userModel.refresh(); // Refresh the UI
+                    },
+                  );
+                },
                 title: 'E-mail',
                 value: userModel.value.email,
               ),
               ProfileMenu(
-                onPressed: () {},
+                onPressed: () {
+                  showEditDialog(
+                    context: context,
+                    title: "Edit Phone Number",
+                    initialValue: userModel.value.phoneNumber,
+                    onSave: (newValue) async {
+                      userModel.value.phoneNumber = newValue;
+                      await UserRepository.instance.updateSingleFiled({
+                        'phoneNumber': userModel.value.phoneNumber,
+                      });
+                      userModel.refresh(); // Refresh the UI
+                    },
+                  );
+                },
                 title: 'Phone Number',
                 value: userModel.value.phoneNumber,
               ),
@@ -163,4 +205,27 @@ class ProfileMenu extends StatelessWidget {
       ),
     );
   }
+}
+void showEditDialog({
+  required BuildContext context,
+  required String title,
+  required String initialValue,
+  required Function(String) onSave,
+}) {
+  final controller = TextEditingController(text: initialValue);
+
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: Text(title),
+      content: TextField(controller: controller),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        ElevatedButton(onPressed: () {
+          onSave(controller.text.trim());
+          Navigator.pop(context);
+        }, child: const Text('Save')),
+      ],
+    ),
+  );
 }

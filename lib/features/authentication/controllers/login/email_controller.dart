@@ -1,4 +1,5 @@
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
@@ -48,11 +49,12 @@ class EmailController extends GetxController {
       } else {
         deviceType = "IOS";
       }
+      final token = await FirebaseMessaging.instance.getToken();
       /// save user data in Firebase FireStore
         final user = UserModel(
            id: userCredential.user!.uid,
            email: email.text.trim(),
-           phoneNumber: "", userType: 0, countryCode: "", deviceToken: "", deviceType: deviceType
+           phoneNumber: "", userType: 0, countryCode: "", deviceToken: token!, deviceType: deviceType
        );
 
        final userRepo = Get.put(UserRepository());

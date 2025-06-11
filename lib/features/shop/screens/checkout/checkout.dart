@@ -74,16 +74,16 @@ class CheckoutScreen extends StatelessWidget {
 
                   // 🚴 Delivery Boy Info
                   _buildSectionTitle("Delivery By", context),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 18),
                   Card(
                     child: ListTile(
                       leading: CircleAvatar(
                         radius: 24,
                         backgroundImage:
-                            selectedDeliveryBoy.value?.profilePicture != null
-                                ? NetworkImage(
-                                    selectedDeliveryBoy.value!.profilePicture!)
-                                : null,
+                        selectedDeliveryBoy.value?.profilePicture != null
+                            ? NetworkImage(
+                            selectedDeliveryBoy.value!.profilePicture!)
+                            : null,
                         child: selectedDeliveryBoy.value?.profilePicture == null
                             ? const Icon(Icons.person)
                             : null,
@@ -99,7 +99,7 @@ class CheckoutScreen extends StatelessWidget {
                           Text("${deliveryDistance.toStringAsFixed(1)} km"),
                           Text("₹$deliveryCharge",
                               style:
-                                  const TextStyle(fontWeight: FontWeight.bold)),
+                              const TextStyle(fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
@@ -109,7 +109,7 @@ class CheckoutScreen extends StatelessWidget {
 
                   // 💳 Payment Method
                   _buildSectionTitle("Payment Method", context),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 18),
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.money),
@@ -121,7 +121,7 @@ class CheckoutScreen extends StatelessWidget {
 
                   // 📦 Order Summary
                   _buildSectionTitle("Summary", context),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 18),
                   _buildSummaryRow("Items Total", "₹$itemsTotal", context),
                   _buildSummaryRow(
                       "Delivery Charges", "₹$deliveryCharge", context),
@@ -133,7 +133,7 @@ class CheckoutScreen extends StatelessWidget {
 
                   // 🏠 Delivery Address
                   _buildSectionTitle("Delivery Address", context),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 18),
                   Obx(() {
                     final address = cartController.selectedAddress.value;
                     return Card(
@@ -145,7 +145,7 @@ class CheckoutScreen extends StatelessWidget {
                             address?.receiverName ?? "No address selected"),
                         subtitle: address != null
                             ? Text(
-                                '${address.house}, ${address.floor}, ${address.landmark}')
+                            '${address.house}, ${address.floor}, ${address.landmark}')
                             : const Text('Please select a delivery address'),
                         trailing: TextButton(
                           onPressed: () => _showAddressBottomSheet(context),
@@ -174,9 +174,9 @@ class CheckoutScreen extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: isPlaceOrderEnabled
                       ? () async {
-                          final controller = Get.put(OrderController());
-                          await controller.placeOrder();
-                        }
+                    final controller = Get.put(OrderController());
+                    await controller.placeOrder();
+                  }
                       : null,
                   icon: const Icon(Icons.check_circle),
                   label: const Text("Place Order"),
@@ -199,9 +199,9 @@ class CheckoutScreen extends StatelessWidget {
       {bool bold = false}) {
     final style = bold
         ? Theme.of(context)
-            .textTheme
-            .titleMedium!
-            .copyWith(fontWeight: FontWeight.bold)
+        .textTheme
+        .titleMedium!
+        .copyWith(fontWeight: FontWeight.bold)
         : Theme.of(context).textTheme.bodyMedium;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -240,7 +240,7 @@ class CheckoutScreen extends StatelessWidget {
                     addressController.fetchAddresses();
                     Navigator.pop(context);
                   },
-                  child: const Text("Add New Address"),
+                  child: const Padding(padding: EdgeInsets.all(6.0),child: Text("Add New Address")),
                 ),
               ],
             ),
@@ -282,8 +282,8 @@ class CheckoutScreen extends StatelessWidget {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+        fontWeight: FontWeight.w600,
+      ),
     );
   }
 }

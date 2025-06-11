@@ -3,9 +3,9 @@ import 'package:water_boy/features/profie/models/address_model.dart';
 
 class UserModel {
   final String id;
-  final String? name;
-  final String email;
-  final String phoneNumber;
+  String? name;
+  String email;
+  String phoneNumber;
   final String? profilePicture;
   final int userType;
   final String countryCode;
@@ -18,7 +18,7 @@ class UserModel {
   final int? perFloreCharge;
   final int? perKmCharge;
   double? extraDistance;
-  final String? ratting;
+  final double? ratting;
 
   UserModel(
       {this.isAvailable,
@@ -36,21 +36,22 @@ class UserModel {
       required this.email,
       required this.phoneNumber,
       this.profilePicture,
-        this.extraDistance,
+      this.extraDistance,
       this.ratting});
 
   static UserModel empty() => UserModel(
-      userType: 0,
-      id: '',
-      name: '',
-      email: '',
-      phoneNumber: '',
-      profilePicture: '',
-      countryCode: '',
-      deviceToken: '',
-      deviceType: '',
-      location: null,
-      addresses: [],);
+        userType: 0,
+        id: '',
+        name: '',
+        email: '',
+        phoneNumber: '',
+        profilePicture: '',
+        countryCode: '',
+        deviceToken: '',
+        deviceType: '',
+        location: null,
+        addresses: [],
+      );
 
   /// convert model to JSON structure for storing data in Firebase
   Map<String, dynamic> toJson() {
@@ -90,27 +91,26 @@ class UserModel {
     int? perFloreCharge,
     int? perKmCharge,
     double? extraDistance,
-    String? ratting,
+    double? ratting,
   }) {
     return UserModel(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      email: email ?? this.email,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
-      profilePicture: profilePicture ?? this.profilePicture,
-      userType: userType ?? this.userType,
-      countryCode: countryCode ?? this.countryCode,
-      deviceToken: deviceToken ?? this.deviceToken,
-      deviceType: deviceType ?? this.deviceType,
-      location: location ?? this.location,
-      addresses: addresses ?? this.addresses,
-      isAvailable: isAvailable ?? this.isAvailable,
-      baseCharge: baseCharge ?? this.baseCharge,
-      perFloreCharge: perFloreCharge ?? this.perFloreCharge,
-      perKmCharge: perKmCharge ?? this.perKmCharge,
-      extraDistance: extraDistance ?? this.extraDistance,
-      ratting: ratting?? this.ratting
-    );
+        id: id ?? this.id,
+        name: name ?? this.name,
+        email: email ?? this.email,
+        phoneNumber: phoneNumber ?? this.phoneNumber,
+        profilePicture: profilePicture ?? this.profilePicture,
+        userType: userType ?? this.userType,
+        countryCode: countryCode ?? this.countryCode,
+        deviceToken: deviceToken ?? this.deviceToken,
+        deviceType: deviceType ?? this.deviceType,
+        location: location ?? this.location,
+        addresses: addresses ?? this.addresses,
+        isAvailable: isAvailable ?? this.isAvailable,
+        baseCharge: baseCharge ?? this.baseCharge,
+        perFloreCharge: perFloreCharge ?? this.perFloreCharge,
+        perKmCharge: perKmCharge ?? this.perKmCharge,
+        extraDistance: extraDistance ?? this.extraDistance,
+        ratting: ratting ?? this.ratting);
   }
 
   factory UserModel.fromSnapShot(
@@ -130,7 +130,7 @@ class UserModel {
         isAvailable: data['isAvailable'] ?? true,
         baseCharge: data['baseCharge'] ?? 0,
         perFloreCharge: data['perFloreCharge'] ?? 0,
-        ratting: data['ratting']??'',
+        ratting: data['ratting']?? 0.0,
         perKmCharge: data['perKmCharge'] ?? 0,
         location: data['location'] != null
             ? UserLocation.fromMap(data['location'])
@@ -146,6 +146,33 @@ class UserModel {
   }
 
 //factory Method to create a User model to a Firebase document snapshot
+}
+
+class DeliveryRating {
+  final String orderId;
+  final String deliveryBoyId;
+  final String userId;
+  final double rating;
+  final String comment;
+
+  DeliveryRating({
+    required this.orderId,
+    required this.deliveryBoyId,
+    required this.userId,
+    required this.rating,
+    required this.comment,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'orderId': orderId,
+      'deliveryBoyId': deliveryBoyId,
+      'userId': userId,
+      'rating': rating,
+      'comment': comment,
+      'timestamp': DateTime.now(),
+    };
+  }
 }
 
 class UserLocation {

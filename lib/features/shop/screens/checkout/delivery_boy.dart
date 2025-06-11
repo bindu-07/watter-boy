@@ -1,14 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 import '../../../../common/widgets/appbar.dart';
 import '../../../../data/repository/authentication/authentication_repository.dart';
-import '../../../../utils/constants/image_string.dart';
 import '../../../../utils/constants/sizes.dart';
 import '../../../authentication/models/users/user_mode.dart';
 import '../../controllers/cart_controller.dart';
@@ -182,7 +178,9 @@ class _DeliveryBoyState extends State<DeliveryBoy> {
                             : Colors.red),
                   ),
                   const SizedBox(height: 8),
-                  Row(
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _infoTag('Base: ₹${boy.baseCharge ?? 0}', context),
@@ -192,6 +190,7 @@ class _DeliveryBoyState extends State<DeliveryBoy> {
                       _infoTag('Per Floor: ₹${boy.perFloreCharge ?? 0}', context),
                     ],
                   ),
+              ),
                   const SizedBox(height: 6),
                   Row(
                     children: [
@@ -200,7 +199,7 @@ class _DeliveryBoyState extends State<DeliveryBoy> {
                           style: theme.textTheme.bodySmall),
                       const SizedBox(width: 12),
                       const Icon(Icons.star, size: 14, color: Colors.amber),
-                      Text('${boy.ratting ?? "N/A"}',
+                      Text(boy.ratting.toString() ?? "0.0",
                           style: theme.textTheme.bodySmall),
                     ],
                   ),

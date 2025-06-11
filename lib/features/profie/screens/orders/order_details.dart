@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
@@ -8,7 +10,9 @@ import 'package:water_boy/common/widgets/appbar.dart';
 import 'package:water_boy/utils/constants/sizes.dart';
 
 import '../../../../utils/constants/image_string.dart';
+import '../../../../utils/popups/loaders.dart';
 import '../../../authentication/models/users/user_mode.dart';
+import '../../controllers/orders/ratting_controller.dart';
 import '../../models/order_model.dart';
 
 class OrderDetailsPage extends StatefulWidget {
@@ -28,6 +32,15 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   void initState() {
     super.initState();
     fetchDeliveryBoy();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final ratingController = Get.put(RatingController());
+      if (widget.order.status == 3) {
+        final alreadyRated = await ratingController.hasRated(widget.order.id);
+        if (!alreadyRated) {
+          _showRatingBottomSheet();
+        }
+      }
+    });
   }
 
   Future<void> fetchDeliveryBoy() async {
@@ -63,9 +76,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               child: ListTile(
                 title: Text("Order ID: #${order.id}"),
                 subtitle: Text("Placed on: ${DateFormat('d MMM y, h:mm a').format(order.createdAt)}"),
-                trailing: Column(
+                trailing: const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(Iconsax.receipt),
                     SizedBox(height: 4),
                     Text("Invoice"),
@@ -80,7 +93,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             Text("Order Status", style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
             Stepper(
+              type: StepperType.vertical,
               currentStep: currentStep,
+              physics: const NeverScrollableScrollPhysics(),
               controlsBuilder: (_, __) => const SizedBox.shrink(),
               steps: [
                 Step(
@@ -161,7 +176,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             Card(
               child: ListTile(
                 leading: const Icon(Iconsax.location),
-                title: Text(order.deliveryAddress.house),
+                title: Text("${order.deliveryAddress.house}, ${order.deliveryAddress.floor}, ${order.deliveryAddress.landmark}"),
               ),
             ),
 
@@ -196,5 +211,104 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       ),
     );
   }
+  void _showRatingBottomSheet() {
+    final ratingController = Get.find<RatingController>();
+    final commentController = TextEditingController();
+    double userRating = 0;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            top: 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text("Rate Your Delivery",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Text(
+                deliveryBoy?.name ?? "Delivery Person",
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              RatingBar.builder(
+                initialRating: 0,
+                minRating: 1,
+                direction: Axis.horizontal,
+                itemCount: 5,
+                itemBuilder: (context, _) => const Icon(Icons.star, color: Colors.amber),
+                onRatingUpdate: (rating) => userRating = rating,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: commentController,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  labelText: 'Comment (optional)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.send),
+                  label: const Text("Submit Rating"),
+                  onPressed: () async {
+                    if (userRating == 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Please give a rating.")),
+                      );
+                      return;
+                    }
+
+                    final rating = DeliveryRating(
+                      orderId: widget.order.id,
+                      deliveryBoyId: widget.order.deliveryBoyId,
+                      userId: widget.order.userId,
+                      rating: userRating,
+                      comment: commentController.text.trim(),
+                    );
+
+                    await ratingController.submitRating(rating);
+
+                    if (mounted) Navigator.pop(context);
+                    TLoaders.successSnackBar(title: 'Success', message: 'Thanks for your feedback!');
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   const SnackBar(content: Text("Thanks for your feedback!")),
+                    // );
+                    setState(() {}); // Refresh page
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 }
 

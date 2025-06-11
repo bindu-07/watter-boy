@@ -1,4 +1,5 @@
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:water_boy/features/authentication/screens/login/enter_otp.dart';
@@ -77,6 +78,7 @@ class LoginController extends GetxController {
       } else {
         deviceType = "IOS";
       }
+      final token = await FirebaseMessaging.instance.getToken();
       /// save user data in Firebase FireStore
       final user = UserModel(
           id: userCredential.user!.uid,
@@ -84,7 +86,7 @@ class LoginController extends GetxController {
           email: userCredential.user!.email?? '',
           phoneNumber: userCredential.user!.phoneNumber?? '',
           profilePicture: userCredential.user!.photoURL?? '',
-          userType: 0, countryCode: "", deviceToken: "", deviceType: deviceType
+          userType: 0, countryCode: "", deviceToken: token!, deviceType: deviceType
       );
 
       final userRepo = Get.put(UserRepository());
