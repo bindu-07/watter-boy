@@ -1,4 +1,5 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -51,14 +52,29 @@ class EmailController extends GetxController {
       }
       final token = await FirebaseMessaging.instance.getToken();
       /// save user data in Firebase FireStore
-        final user = UserModel(
-           id: userCredential.user!.uid,
-           email: email.text.trim(),
-           phoneNumber: "", userType: 0, countryCode: "", deviceToken: token!, deviceType: deviceType
-       );
+      final userRepo = Get.put(UserRepository());
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).get();
 
-       final userRepo = Get.put(UserRepository());
-       await userRepo.saveUserData(user);
+      if (!userDoc.exists) {
+        /// Only create the user if not already exists
+        final user = UserModel(
+            id: userCredential.user!.uid,
+            email: email.text.trim(),
+            phoneNumber: "",
+            userType: 0,
+            countryCode: "",
+            deviceToken: token!,
+            deviceType: deviceType
+        );
+
+        await userRepo.saveUserData(user);
+      }else {
+        /// If already exists, just update deviceToken and deviceType if needed
+        await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).update({
+          'deviceToken': token,
+          'deviceType': deviceType,
+        });
+      }
 
        TFullScreenLoader.stopLoading();
 
